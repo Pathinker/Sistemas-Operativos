@@ -1,7 +1,7 @@
 #ifndef NODO_H
 #define NODO_H
 
-class template<typename T>Nodo{
+template<typename T>  class Nodo{// Quiero que sea template, para poder almacenar el tipo de dato que yo quiera, en este caso voy a almacenar la clase calculadora
 
     private:
 
@@ -10,7 +10,22 @@ class template<typename T>Nodo{
 
     public:
 
-        Nodo(T d) : dato(d), siguiente(nullptr) {}
+        Nodo(T d){ // Constructor
+
+            Dato = d;
+            Enlace = nullptr
+        }
+
+        void establecerDato(T Informacion){
+
+            Dato = Informacion;
+        }   
+
+        void establecerEnlace(Nodo* Direccion){
+
+            Enlace = Direccion;
+
+        }
 
 };
 
