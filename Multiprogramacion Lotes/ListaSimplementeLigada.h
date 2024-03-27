@@ -3,18 +3,19 @@
 
 #include "Nodo.h"
 
-class template<typename T>ListaSimplementeLigada{
+template<typename T> class ListaSimplementeLigada{
 
     private:
 
-        Nodo<T> *Cabeza // Puntero del inicio de mi lista, solamente es posible recorrerla en un sentido.
+        Nodo<T> *Cabeza; // Puntero del inicio de mi lista, solamente es posible recorrerla en un sentido.
+        Nodo<T> *Ultimo; 
         
 
     public:
 
     ListaSimplementeLigada(){
 
-        Cabeza = nullptr // Inicializar mi cabeza en nullptr porque no tengo ningun dato almacenado aún
+        Cabeza = nullptr; // Inicializar mi cabeza en nullptr porque no tengo ningun dato almacenado aún
 
     }
 
@@ -43,7 +44,7 @@ class template<typename T>ListaSimplementeLigada{
 
     }   
 
-    void eliminarInicio(T Dato){
+    void eliminarInicio(){
 
         if(Cabeza){ 
 
@@ -56,6 +57,22 @@ class template<typename T>ListaSimplementeLigada{
     
     }
 
-}
+    void insertarFinal(T Dato){
 
+        Nodo<T>* nuevoNodo = new Nodo<T>(Dato);
+
+        if(!Cabeza){
+
+            Cabeza = nuevoNodo;
+            Ultimo = nuevoNodo;
+            
+        }else{
+
+            Ultimo -> establecerEnlace(nuevoNodo);
+            Ultimo  = nuevoNodo;
+    
+        }
+    }  
+
+};
 #endif
