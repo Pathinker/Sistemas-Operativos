@@ -4,12 +4,12 @@
 
 .data
       
-    primerMensaje db "--- Productor Consumidor ---" 10, 13, "$"
-    segundoMensaje db 10, 10, 13, "--- B U F F E R ----" 10, 10, 13, "$"
+    primerMensaje db "--- Productor Consumidor ---", 10, 13, "$"
+    segundoMensaje db 10, 10, 13, "--- B U F F E R ----", 10, 10, 13, "$"
        
-    productor db 10, , 13 "Productor: ", "$"
-    consumidor db 10, 13"Consumidor: ", "$"
-    bandera dw 0h ; 1 =  Productor, 2 = Consumidor
+    productor db 10, , 13, "Productor: ", "$"
+    consumidor db 10, 13, "Consumidor: ", "$"
+    bandera dw 0h ; 1 =  Productor, 2 = Consumidor        
     
     activo db 09, "Activo", 10, 13, "$"
     trabajando db 09, "Trabajando",10, 13, "$"
@@ -21,9 +21,10 @@
     
     error db "No existen productos suficientes", "$"   
     
-    disponible db 14h
+    disponible db 0h
     buffer db 20 dup ("0")
-    bufferPtr db 0h
+    productorPtr db 0h
+    consumidorPtr db 0h
     
 .code
 
@@ -64,6 +65,12 @@
     
     produccion proc
         
+        push ax
+        push bx
+        push cx
+        push dx
+        push si
+            
         mov ax, 09h
         lea dx, productor
         int 21h
@@ -77,6 +84,10 @@
         
         mov ax, 09h
         lea dx, dormido
+        int 21h
+        
+        mov ax, 09h
+        lea dx, segundoMensaje
         int 21h 
         
         mov ax, 09h
@@ -92,26 +103,129 @@
         
             xor si, si
             xor cx, cx
-            mov si, bufferPtr
+            mov si, productorPtr
         
             produccionBucle:
             
                 mov buffer[si], "1"
                 inc si
                 inc cx
+                                
+                cmp si, 013h        
+                    jne produccionFinal
+                    xor si, si
+                    
+                produccionFinal:     
                 
-                cmp cx, numeroExito
-                    jl produccionBucle
-                
-             mov bufferPtr, si
+                    cmp cx, numeroExito
+                        jl produccionBucle
+                        
+                        
+             ; Almacenar la casilla donde la produccion termino           
+                       
+             mov productorPtr, si
+             
+             ; Actualizar la cantidad disponible de elementos para consumir
+             
+             mov ax, disponible
+             add ax, numeroExito
+             mov disponible, ax
+             
              xor cx, cx
              xor si, si
                
-             call impresion 
+             call impresion
+             
+         pop si
+         pop dx
+         pop cx
+         pop bx
+         pop ax
+         
+         ret 
                         
         producir endp
+    
+    consumicion proc
+        
+        push ax
+        push bx
+        push cx
+        push dx
+        push si
+        
+        mov ax, 09h
+        lea dx, productor
+        int 21h
+        
+        mov ax, 09h
+        lea dx, dormido
+        
+        mov ax, 09h
+        lea dx, consumidor
+        int 21h
+        
+        mov ax, 09h
+        lea dx, activo
+        int 21h 
+        
+        mov ax, 09h
+        lea dx, segundoMensaje
+        int 21h 
+        
+        mov ax, 09h
+        lea dx, consumidor
+        int 21h
+        
+        mov ax, 09h
+        lea dx, trabajando
+        int 21h
+        
+        mov bx, 02h
+        call rand
+        
+            xor si, si
+            xor cx, cx
+            mov si, consumidorPtr
+        
+            consumicionBucle:
+            
+                mov buffer[si], "0"
+                inc si
+                inc cx
+                
+                cmp si, 013h        
+                    jne produccionFinal
+                    xor si, si
+                    
+                produccionFinal:     
+                
+                    cmp cx, numeroExito
+                        jl produccionBucle
+                       
+             ; Almacenar la casilla donde el consumidor termino           
+                       
+             mov consumidorPtr, si
+             
+             ; Actualizar la cantidad disponible de elementos para consumir
+             
+             mov ax, disponible
+             add ax, numeroExito
+             mov disponible, ax
+             
+             xor cx, cx
+             xor si, si
+             call impresion
+             
+        pop ax
+        pop bx
+        pop cx
+        pop dx
+        pop si
+        
+        consumicion endp
 
-   rand proc
+   rand proc ; El rand tiene dos opciones 01 = BX retorna un numero random entre 1 y 2, 02 = BX retorna un numero random entre 4 - 7.
    
         push ax
         push bx
@@ -159,10 +273,47 @@
    
     rand endp 
    
-   impresion proc
+   impresion proc ; Imprime los valores uno por uno, divide entre 5 para encontrar residuo 0, en dado caso \n para mantener una grilla.
     
-    ; Seccion donde se mostrara el buffer con los datos remanentes
+    push ax
+    push bx
+    push si 
+   
+    xor ax, ax
+    xor si, si
     
+    mov ah, 02h
+    
+    impresionBucle:
+    
+        mov al, buffer[si]
+        int 21h
+                  
+        inc si           
+        xor ax, ax 
+        mov ax, si
+        mov bx, 05h
+        
+        div bx
+       
+        cmp si, 13h
+            je impresionFinal
+       
+        cmp dx, 0h
+            jne impresionBucle:
+            
+        mov al, 0Ah
+        int 21h
+        jmp impresionBucle
+        
+    impresionFinal:
+    
+        pop si
+        pop bx
+        pop ax
+        
+        ret
+  
     impresion endp
 
 end code
