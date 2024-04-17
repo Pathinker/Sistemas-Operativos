@@ -15,16 +15,16 @@
     trabajando db 09, "Trabajando",10, 13, "$"
     dormido db 09, "Dormido", 10, 13, "$"
     
-    productorExito db "Se ha producido: ", "$"
-    consumidorExito db "Se ha consumido: ", "$"
+    productorExito db 10, 10, 13,"Se ha producido: ", "$"
+    consumidorExito db 10, 10, 13, "Se ha consumido: ", "$"
     numeroExito dw ?
     
     error db "No existen productos suficientes", "$"   
     
-    disponible db 0h
+    disponible dw 0h
     buffer db 20 dup ("0")
-    productorPtr db 0h
-    consumidorPtr db 0h
+    productorPtr dw 0h
+    consumidorPtr dw 0h
     
 .code
 
@@ -58,7 +58,7 @@
             jmp bucleMenu
         
         consumir:
-            call consumicion
+            call consumision
             jmp bucleMenu        
                
         menu endp
@@ -71,30 +71,31 @@
         push dx
         push si
             
-        mov ax, 09h
+        mov ah, 09h
         lea dx, productor
         int 21h
         
-        mov ax, 09h
+        mov ah, 09h
         lea dx, activo
+        int 21h
         
-        mov ax, 09h
+        mov ah, 09h
         lea dx, consumidor
         int 21h
         
-        mov ax, 09h
+        mov ah, 09h
         lea dx, dormido
         int 21h
         
-        mov ax, 09h
+        mov ah, 09h
         lea dx, segundoMensaje
         int 21h 
         
-        mov ax, 09h
+        mov ah, 09h
         lea dx, productor
         int 21h
         
-        mov ax, 09h
+        mov ah, 09h
         lea dx, trabajando
         int 21h
         
@@ -110,7 +111,13 @@
                 mov buffer[si], "1"
                 inc si
                 inc cx
-                                
+                
+                add cx, disponible
+           
+                cmp cx, 13h
+                    sub cx, disponible
+                    je produccionLleno 
+                     
                 cmp si, 013h        
                     jne produccionFinal
                     xor si, si
@@ -119,6 +126,8 @@
                 
                     cmp cx, numeroExito
                         jl produccionBucle
+                
+                produccionLleno:        
                         
                         
              ; Almacenar la casilla donde la produccion termino           
@@ -136,6 +145,19 @@
                
              call impresion
              
+             ; Indica cuantos elementos se producieron con exito
+             
+             mov ax, 09h
+             lea dx, productorExito
+             int 21h
+             
+             ; Adicionamos 48 Decimal para transformar la cantidad de bucles realizados en CX.
+             
+             add cl, "0"
+             mov ah, 02h
+             mov al, cl
+             int 21h
+                
          pop si
          pop dx
          pop cx
@@ -144,45 +166,46 @@
          
          ret 
                         
-        producir endp
+        produccion endp
     
-    consumicion proc
+    consumision proc
         
         push ax
         push bx
         push cx
         push dx
         push si
-        
-        mov ax, 09h
-        lea dx, productor
-        int 21h
-        
-        mov ax, 09h
-        lea dx, dormido
-        
-        mov ax, 09h
+            
+        mov ah, 09h
         lea dx, consumidor
         int 21h
         
-        mov ax, 09h
+        mov ah, 09h
         lea dx, activo
         int 21h 
         
-        mov ax, 09h
+        mov ah, 09h
+        lea dx, productor
+        int 21h
+        
+        mov ah, 09h
+        lea dx, dormido
+        int 21h
+        
+        mov ah, 09h
         lea dx, segundoMensaje
         int 21h 
         
-        mov ax, 09h
+        mov ah, 09h
         lea dx, consumidor
         int 21h
         
-        mov ax, 09h
+        mov ah, 09h
         lea dx, trabajando
         int 21h
         
         mov bx, 02h
-        call rand
+        call rand 
         
             xor si, si
             xor cx, cx
@@ -194,36 +217,61 @@
                 inc si
                 inc cx
                 
+                sub cx, disponible
+           
+                cmp cx, 0h
+                    add cx, disponible
+                    je consumicionVacio 
+                     
                 cmp si, 013h        
-                    jne produccionFinal
+                    jne consumicionFinal
                     xor si, si
                     
-                produccionFinal:     
+                consumicionFinal:     
                 
                     cmp cx, numeroExito
-                        jl produccionBucle
+                        jl consumicionBucle
+                
+                consumicionVacio:        
+                        
+                        
+             ; Almacenar la casilla donde la produccion termino           
                        
-             ; Almacenar la casilla donde el consumidor termino           
-                       
-             mov consumidorPtr, si
+             mov productorPtr, si
              
              ; Actualizar la cantidad disponible de elementos para consumir
              
              mov ax, disponible
-             add ax, numeroExito
+             sub ax, numeroExito
              mov disponible, ax
              
              xor cx, cx
              xor si, si
+               
              call impresion
              
-        pop ax
-        pop bx
-        pop cx
-        pop dx
-        pop si
-        
-        consumicion endp
+             ; Indica cuantos elementos se producieron con exito
+             
+             mov ax, 09h
+             lea dx, consumidorExito
+             int 21h
+             
+             ; Adicionamos 48 Decimal para transformar la cantidad de bucles realizados en CX.
+             
+             add cl, "0"
+             mov ah, 02h
+             mov al, cl
+             int 21h
+                
+         pop si
+         pop dx
+         pop cx
+         pop bx
+         pop ax
+         
+         ret 
+                        
+        consumision endp
 
    rand proc ; El rand tiene dos opciones 01 = BX retorna un numero random entre 1 y 2, 02 = BX retorna un numero random entre 4 - 7.
    
@@ -244,7 +292,7 @@
         cmp bx, 02h
         je segundaOpcion 
             
-            primerOpcion:
+            primeraOpcion:
             
                 mov cx, 2h
                 div cx 
@@ -304,6 +352,9 @@
             
         mov al, 0Ah
         int 21h
+        mov al, 0D
+        int 21h
+             
         jmp impresionBucle
         
     impresionFinal:
