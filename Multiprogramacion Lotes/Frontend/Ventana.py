@@ -19,6 +19,11 @@ class Ventana:
         self.primerGris = "#19191a"
         self.segundoGris = "#4A4A4D"
         self.textoGris = "#c6c6c6"
+
+        #Variables Compartidas con el backend.
+
+        self.lotesRestantes = 0
+        self.Tiempo = 0
     
         self.generarFrames(self.app)
         self.app.mainloop()
@@ -105,8 +110,8 @@ class Ventana:
         Frame.rowconfigure(1, weight = 1)
         Frame.columnconfigure(0, weight = 1)    
 
-        tituloAncho = self.obtenerEscala(Ancho, 100)
-        tituloLargo = self.obtenerEscala(Largo, 5)
+        encabezadoAncho = self.obtenerEscala(Ancho, 100)
+        encabezadoLargo = self.obtenerEscala(Largo, 5)
 
         nuevosAncho = self.obtenerEscala(Ancho, 100)
         nuevosLargo = self.obtenerEscala(Largo, 95)
@@ -115,23 +120,57 @@ class Ventana:
                           dark_image = Image.open("Frontend/Imagenes/Nuevos.png"),
                           size = (16, 16))
         
-        titulo = CTkLabel(master = Frame,
-                          width = tituloAncho,
-                          height = tituloLargo,
-                          fg_color = self.primerGris,
-                          text = " Nuevos",
-                          font = ("Helvetica", 14),
-                          anchor = "w",
-                          image = Imagen,
-                          compound = "left")
+        encabezado = CTkFrame(master = Frame,
+                          width = encabezadoAncho,
+                          height = encabezadoLargo)
         
         nuevosContenedor = CTkScrollableFrame(master = Frame,
                                               width = nuevosAncho,
                                               height = nuevosLargo,
                                               fg_color = self.colorFondo)
         
-        titulo.grid(row = 0, column = 0, sticky = "nsew")
+        encabezado.grid(row = 0, column = 0, sticky = "nsew")
         nuevosContenedor.grid(row = 1, column = 0, sticky = "nsew")
+
+        #Modificar el contenedor encabezado para contener los lotes restantes.
+
+        encabezado.rowconfigure(0, weight = 1)
+        encabezado.columnconfigure(0, weight = 1)
+        encabezado.columnconfigure(1, weight = 1)
+
+        tituloAncho = self.obtenerEscala(encabezadoAncho, 50)
+        tituloLargo = self.obtenerEscala(encabezadoLargo, 100)
+
+        imagenNuevos = CTkImage(light_image = Image.open("Frontend/Imagenes/Nuevos.png"),
+                          dark_image = Image.open("Frontend/Imagenes/Nuevos.png"),
+                          size = (16, 16))
+        
+        tituloNuevo = CTkLabel(master = encabezado,
+                          width = tituloAncho,
+                          height = tituloLargo,
+                          fg_color = self.primerGris,
+                          text = " Nuevos",
+                          font = ("Helvetica", 14),
+                          anchor = "w",
+                          image = imagenNuevos,
+                          compound = "left")
+
+        imagenRestantes = CTkImage(light_image = Image.open("Frontend/Imagenes/Restantes.png"),
+                          dark_image = Image.open("Frontend/Imagenes/Restantes.png"),
+                          size = (16, 16))
+        
+        tituloPendientes = CTkLabel(master = encabezado,
+                          width = tituloAncho,
+                          height = tituloLargo,
+                          fg_color = self.primerGris,
+                          text = " Lotes Retantes: {} ".format(self.lotesRestantes),
+                          font = ("Helvetica", 14),
+                          anchor = "e",
+                          image = imagenRestantes,
+                          compound = "left")
+        
+        tituloNuevo.grid(row = 0, column = 0, sticky = "nsew")    
+        tituloPendientes.grid(row = 0, column = 1, sticky = "nsew")         
 
     def generarPendientes(self, Frame, Ancho, Largo):
 
@@ -175,33 +214,61 @@ class Ventana:
         Frame.rowconfigure(1, weight = 1)
         Frame.columnconfigure(0, weight = 1)    
 
-        tituloAncho = self.obtenerEscala(Ancho, 100)
-        tituloLargo = self.obtenerEscala(Largo, 5)
+        encabezadoAncho = self.obtenerEscala(Ancho, 100)
+        encabezadoLargo = self.obtenerEscala(Largo, 5)
 
-        nuevosAncho = self.obtenerEscala(Ancho, 100)
-        nuevosLargo = self.obtenerEscala(Largo, 95)
+        terminadosAncho = self.obtenerEscala(Ancho, 100)
+        terminadosLargo = self.obtenerEscala(Largo, 95)
+        
+        encabezado = CTkFrame(master = Frame,
+                          width = encabezadoAncho,
+                          height = encabezadoLargo)
+        
+        terminadosContenedor = CTkScrollableFrame(master = Frame,
+                                              width = terminadosAncho,
+                                              height = terminadosLargo,
+                                              fg_color = self.colorFondo)
+        
+        encabezado.grid(row = 0, column = 0, sticky = "nsew")
+        terminadosContenedor.grid(row = 1, column = 0, sticky = "nsew")
 
-        Imagen = CTkImage(light_image = Image.open("Frontend/Imagenes/Terminados.png"),
+        encabezado.rowconfigure(0, weight = 1)
+        encabezado.columnconfigure(0, weight = 1)
+        encabezado.columnconfigure(1, weight = 1)
+
+        tituloAncho = self.obtenerEscala(encabezadoAncho, 50)
+        tituloLargo = self.obtenerEscala(encabezadoLargo, 100)
+
+        imagenTerminados = CTkImage(light_image = Image.open("Frontend/Imagenes/Terminados.png"),
                           dark_image = Image.open("Frontend/Imagenes/Terminados.png"),
                           size = (16, 16))
         
-        titulo = CTkLabel(master = Frame,
+        tituloTerminados = CTkLabel(master = encabezado,
                           width = tituloAncho,
                           height = tituloLargo,
                           fg_color = self.primerGris,
                           text = " Terminados",
                           font = ("Helvetica", 14),
                           anchor = "w",
-                          image = Imagen,
+                          image = imagenTerminados,
+                          compound = "left")
+
+        imagenRestantes = CTkImage(light_image = Image.open("Frontend/Imagenes/Reloj.png"),
+                          dark_image = Image.open("Frontend/Imagenes/Reloj.png"),
+                          size = (16, 16))
+        
+        tituloReloj = CTkLabel(master = encabezado,
+                          width = tituloAncho,
+                          height = tituloLargo,
+                          fg_color = self.primerGris,
+                          text = " Reloj: {} ".format(self.Tiempo),
+                          font = ("Helvetica", 14),
+                          anchor = "e",
+                          image = imagenRestantes,
                           compound = "left")
         
-        nuevosContenedor = CTkScrollableFrame(master = Frame,
-                                              width = nuevosAncho,
-                                              height = nuevosLargo,
-                                              fg_color = self.colorFondo)
-        
-        titulo.grid(row = 0, column = 0, sticky = "nsew")
-        nuevosContenedor.grid(row = 1, column = 0, sticky = "nsew")
+        tituloTerminados.grid(row = 0, column = 0, sticky = "nsew")    
+        tituloReloj.grid(row = 0, column = 1, sticky = "nsew")           
         
     def cajaTexto(self, Frame, Ancho, Largo):
 
@@ -238,7 +305,7 @@ class Ventana:
                                font=("Consolas", 16))
         
         Contenido.insert("1.0", "Escriba Teclas Entrada\n\n")
-        Contenido.insert("3.0", "E: Interrupcion  Entrada/Salida\n")
+        Contenido.insert("3.0", "E: Interrupcion Entrada/Salida\n")
         Contenido.insert("4.0", "W: Error\n")
         Contenido.insert("5.0", "P: Pausa\n")
         Contenido.insert("6.0", "C: Continuar\n\n")
