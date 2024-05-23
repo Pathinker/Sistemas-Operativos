@@ -2,17 +2,17 @@ import random
 
 class Lote:
 
-    def __init__(self):
+    def __init__(self, Numero):
 
-        self.ID = 0
-        self.tiempoEstimado = random.randit(5, 18)
+        self.ID = Numero
+        self.tiempoEstimado = random.randint(5, 18)
         self.tiempoEjecutado = 0
-        self.primerOperando = random.randit(1, 10000)
-        self.segundoOperando = random.randit(1, 10000)
-        self.Operacion = self.obtenerOperando(random.randit(1, 5))
+        self.primerOperando = random.randint(1, 10000)
+        self.segundoOperando = random.randint(1, 10000)
+        self.Operacion = self.obtenerOperando(random.randint(1, 5))
         self.Resultado = self.realizarOperacion(self.primerOperando, self.segundoOperando, self.Operacion)    
 
-    def obtenerOperando(Numero):
+    def obtenerOperando(self, Numero):
 
         if(Numero == 1):
             
@@ -34,7 +34,7 @@ class Lote:
 
             return "%"
         
-    def realizarOperacion(primerOperando, segundoOperando, Operador):
+    def realizarOperacion(self, primerOperando, segundoOperando, Operador):
 
         if(Operador == "+"):
 
