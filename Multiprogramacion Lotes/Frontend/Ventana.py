@@ -88,7 +88,8 @@ class Ventana:
         
         Pendientes = CTkFrame(master = Frame,
                               width = contenedoresAncho,
-                              height = contenedoresLargo)
+                              height = contenedoresLargo,
+                              fg_color = "#2B2B2B")
 
         Terminados = CTkFrame(master = Frame,
                               width = contenedoresAncho,
@@ -115,10 +116,6 @@ class Ventana:
 
         nuevosAncho = self.obtenerEscala(Ancho, 100)
         nuevosLargo = self.obtenerEscala(Largo, 95)
-
-        Imagen = CTkImage(light_image = Image.open("Frontend/Imagenes/Nuevos.png"),
-                          dark_image = Image.open("Frontend/Imagenes/Nuevos.png"),
-                          size = (16, 16))
         
         encabezado = CTkFrame(master = Frame,
                           width = encabezadoAncho,
@@ -187,14 +184,16 @@ class Ventana:
         Listos = CTkFrame(master = Frame,
                           width = listosAncho,
                           height = listosLargo,
+                          corner_radius = 0
                           ) 
         
         Ejecucion = CTkFrame(master = Frame,
                              width = ejecucionAncho,
                              height = ejecucionLargo,
+                             corner_radius = 0
                              )
         
-        Listos.grid(row = 0, column = 0, sticky = "nsew")
+        Listos.grid(row = 0, column = 0, sticky = "nsew", pady = (0, 5))
         Ejecucion.grid(row = 1, column = 0, sticky = "nsew")
 
         self.generarListos(Listos, listosAncho, listosLargo)
@@ -202,11 +201,103 @@ class Ventana:
 
     def generarListos(self, Frame, Ancho, Largo):
 
-        pass
+        Frame.rowconfigure(0, weight = 0)
+        Frame.rowconfigure(1, weight = 1)
+        Frame.columnconfigure(0, weight = 1)    
+
+        encabezadoAncho = self.obtenerEscala(Ancho, 100)
+        encabezadoLargo = self.obtenerEscala(Largo, 5)
+
+        listosAncho = self.obtenerEscala(Ancho, 100)
+        listosLargo = self.obtenerEscala(Largo, 95)
+
+        encabezado = CTkFrame(master = Frame,
+                          width = encabezadoAncho,
+                          height = encabezadoLargo,
+                          corner_radius = 0)
+        
+        nuevosContenedor = CTkScrollableFrame(master = Frame,
+                                              width = listosAncho,
+                                              height = listosLargo,
+                                              fg_color = self.colorFondo,
+                                              corner_radius = 0)
+        
+        encabezado.grid(row = 0, column = 0, sticky = "nsew")
+        nuevosContenedor.grid(row = 1, column = 0, sticky = "nsew")
+
+        #Modificar el contenedor encabezado para contener los lotes restantes.
+
+        encabezado.rowconfigure(0, weight = 1)
+        encabezado.columnconfigure(0, weight = 1)
+
+        tituloAncho = self.obtenerEscala(encabezadoAncho, 100)
+        tituloLargo = self.obtenerEscala(encabezadoLargo, 100)
+
+        imagenNuevos = CTkImage(light_image = Image.open("Frontend/Imagenes/Listos.png"),
+                          dark_image = Image.open("Frontend/Imagenes/Listos.png"),
+                          size = (16, 16))
+        
+        tituloNuevo = CTkLabel(master = encabezado,
+                          width = tituloAncho,
+                          height = tituloLargo,
+                          fg_color = self.primerGris,
+                          text = " Listos",
+                          font = ("Helvetica", 14),
+                          anchor = "w",
+                          image = imagenNuevos,
+                          compound = "left")
+        
+        tituloNuevo.grid(row = 0, column = 0, sticky = "nsew")    
 
     def generarEjecucion(self, Frame, Ancho, Largo):
 
-        pass
+        Frame.rowconfigure(0, weight = 0)
+        Frame.rowconfigure(1, weight = 1)
+        Frame.columnconfigure(0, weight = 1)    
+
+        encabezadoAncho = self.obtenerEscala(Ancho, 100)
+        encabezadoLargo = self.obtenerEscala(Largo, 5)
+
+        ejecucionAncho = self.obtenerEscala(Ancho, 100)
+        ejecucionLargo = self.obtenerEscala(Largo, 95)
+
+        encabezado = CTkFrame(master = Frame,
+                          width = encabezadoAncho,
+                          height = encabezadoLargo,
+                          corner_radius = 0)
+        
+        nuevosContenedor = CTkScrollableFrame(master = Frame,
+                                              width = ejecucionAncho,
+                                              height = ejecucionLargo,
+                                              fg_color = self.colorFondo,
+                                              corner_radius = 0)
+        
+        encabezado.grid(row = 0, column = 0, sticky = "nsew")
+        nuevosContenedor.grid(row = 1, column = 0, sticky = "nsew")
+
+        #Modificar el contenedor encabezado para contener los lotes restantes.
+
+        encabezado.rowconfigure(0, weight = 1)
+        encabezado.columnconfigure(0, weight = 1)
+
+        tituloAncho = self.obtenerEscala(encabezadoAncho, 100)
+        tituloLargo = self.obtenerEscala(encabezadoLargo, 100)
+
+        imagenEjecucion = CTkImage(light_image = Image.open("Frontend/Imagenes/Ejecucion.png"),
+                          dark_image = Image.open("Frontend/Imagenes/Ejecucion.png"),
+                          size = (16, 16))
+        
+        tituloEjecucion = CTkLabel(master = encabezado,
+                          width = tituloAncho,
+                          height = tituloLargo,
+                          fg_color = self.primerGris,
+                          text = " Ejecucion",
+                          font = ("Helvetica", 14),
+                          anchor = "w",
+                          image = imagenEjecucion,
+                          compound = "left")
+        
+        tituloEjecucion.grid(row = 0, column = 0, sticky = "nsew")    
 
     def generarTerminados(self, Frame, Ancho, Largo):
 
