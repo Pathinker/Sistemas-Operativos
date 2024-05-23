@@ -84,10 +84,23 @@ class Lote:
 
         return self.Resultado
     
-    def asignarTiempoEjecutado(self, Cantidad):
+    def asignarID(self, Cantidad):
 
         self.ID = Cantidad
 
     def asignarTiempoEjecutado(self, Cantidad):
 
         self.tiempoEjecutado = Cantidad
+
+    def obtenerTodo(self):
+
+        Temporal = []
+
+        Temporal.append(self.obtenerID())
+        Temporal.append(self.obtenerTiempoEstimado())
+        Temporal.append(self.obtenerTiempoEjecutado())
+        Temporal.append(self.obtenerPrimerOperando()) 
+        Temporal.append(self.obtenerOperacion())
+        Temporal.append(self.obtenerSegundoOperando())
+
+        return Temporal
