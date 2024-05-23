@@ -1,5 +1,9 @@
 from customtkinter import *
+from CTkTable import *
 from PIL import Image
+import time
+
+from Backend import Multiprogramacion
 
 class Ventana:
 
@@ -23,11 +27,19 @@ class Ventana:
         #Variables Compartidas con el backend.
 
         self.lotesRestantes = 0
-        self.Tiempo = 0
+        self.Tiempo = [0]
+        self.Multiprogramacion = Multiprogramacion.Lotes(10)
+
+        self.app.protocol("WM_DELETE_WINDOW", self.cerrarVentana)
     
         self.generarFrames(self.app)
         self.app.mainloop()
-        
+
+    def cerrarVentana(self):
+
+        self.Multiprogramacion.detener()
+        self.app.destroy()    
+    
     def obtenerAncho(self, Ventana, Proporcion):
 
         Ancho = Ventana.winfo_screenwidth()
@@ -51,10 +63,10 @@ class Ventana:
         Ventana.columnconfigure(0, weight = 1)
 
         primerFrameAncho = self.obtenerEscala(self.ventanaAncho, 100) 
-        primerFrameLargo = self.obtenerEscala(self.ventanaLargo, 66)
+        primerFrameLargo = self.obtenerEscala(self.ventanaLargo, 60)
 
         segundoFrameAncho = self.obtenerEscala(self.ventanaAncho, 100)
-        segundoFrameLargo = self.obtenerEscala(self.ventanaLargo, 33)
+        segundoFrameLargo = self.obtenerEscala(self.ventanaLargo, 40)
 
         primerFrame = CTkFrame(master = Ventana,
                                width = primerFrameAncho,
@@ -167,7 +179,37 @@ class Ventana:
                           compound = "left")
         
         tituloNuevo.grid(row = 0, column = 0, sticky = "nsew")    
-        tituloPendientes.grid(row = 0, column = 1, sticky = "nsew")         
+        tituloPendientes.grid(row = 0, column = 1, sticky = "nsew")      
+
+        self.actualizarNuevos(nuevosContenedor, nuevosAncho, nuevosLargo)   
+
+    def actualizarNuevos(self, Frame, Ancho, Largo):
+
+        Frame.rowconfigure(0, weight = 1)
+        Frame.columnconfigure(0, weight = 1)
+
+        Valores = self.Multiprogramacion.obtenerProcesos()
+        datosTabla = [["ID", "T/ Estimado", "T/ Ejecutado"]]
+
+        for i in  Valores:
+
+            Datos = []
+
+            Datos.append(i.obtenerID())
+            Datos.append(i.obtenerTiempoEstimado())
+            Datos.append(i.obtenerTiempoEjecutado())
+
+            datosTabla.append(Datos)
+
+        print(datosTabla)    
+
+        tabla = CTkTable(master = Frame,
+                         row = len(datosTabla),
+                         column = len(datosTabla[0]),
+                         values = datosTabla,
+                         corner_radius = 0)
+        
+        tabla.grid(row = 0, column = 0, sticky = "nsew")        
 
     def generarPendientes(self, Frame, Ancho, Largo):
 
@@ -208,7 +250,7 @@ class Ventana:
         encabezadoAncho = self.obtenerEscala(Ancho, 100)
         encabezadoLargo = self.obtenerEscala(Largo, 5)
 
-        listosAncho = self.obtenerEscala(Ancho, 100)
+        listoAncho = self.obtenerEscala(Ancho, 100)
         listosLargo = self.obtenerEscala(Largo, 95)
 
         encabezado = CTkFrame(master = Frame,
@@ -216,14 +258,14 @@ class Ventana:
                           height = encabezadoLargo,
                           corner_radius = 0)
         
-        nuevosContenedor = CTkScrollableFrame(master = Frame,
-                                              width = listosAncho,
+        listosContenedor = CTkScrollableFrame(master = Frame,
+                                              width = listoAncho,
                                               height = listosLargo,
                                               fg_color = self.colorFondo,
                                               corner_radius = 0)
         
         encabezado.grid(row = 0, column = 0, sticky = "nsew")
-        nuevosContenedor.grid(row = 1, column = 0, sticky = "nsew")
+        listosContenedor.grid(row = 1, column = 0, sticky = "nsew")
 
         #Modificar el contenedor encabezado para contener los lotes restantes.
 
@@ -247,8 +289,8 @@ class Ventana:
                           image = imagenNuevos,
                           compound = "left")
         
-        tituloNuevo.grid(row = 0, column = 0, sticky = "nsew")    
-
+        tituloNuevo.grid(row = 0, column = 0, sticky = "nsew")  
+        
     def generarEjecucion(self, Frame, Ancho, Largo):
 
         Frame.rowconfigure(0, weight = 0)
@@ -352,11 +394,13 @@ class Ventana:
                           width = tituloAncho,
                           height = tituloLargo,
                           fg_color = self.primerGris,
-                          text = " Reloj: {} ".format(self.Tiempo),
+                          text = " Reloj: {} ".format(self.Tiempo[0]),
                           font = ("Helvetica", 14),
                           anchor = "e",
                           image = imagenRestantes,
                           compound = "left")
+        
+        self.Multiprogramacion.contador(tituloReloj)
         
         tituloTerminados.grid(row = 0, column = 0, sticky = "nsew")    
         tituloReloj.grid(row = 0, column = 1, sticky = "nsew")           
