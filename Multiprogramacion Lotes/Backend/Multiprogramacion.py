@@ -21,7 +21,7 @@ class Lotes:
 
     def iniciar(self, frameNuevos, frameListos, frameEjecucion, frameTerminados, frameTiempo, frameLotes):  
 
-        self.Contador = threading.Thread(target=self.ejecutar, args=(frameNuevos, frameListos, frameEjecucion, frameTerminados, frameTiempo, frameLotes))
+        self.Contador = threading.Thread(target=self.ejecutar, daemon = True, args=(frameNuevos, frameListos, frameEjecucion, frameTerminados, frameTiempo, frameLotes))
         self.Contador.start()
 
     def detener(self):
@@ -48,6 +48,22 @@ class Lotes:
 
             self.procesosEjecucion[0].asignarTiempoEjecutado(self.procesosEjecucion[0].obtenerTiempoEjecutado() + 1)
             self.tablaEjecucion.insert(1,2,self.procesosEjecucion[0].obtenerTiempoEjecutado())
+
+            #Al agotarse el tiempo de ejecucion hacer un swap mandar el ejecutado a terminado y uno de listo a ejecucion.
+
+            if(self.procesosEjecucion[0].obtenerTiempoEjecutado() >= self.procesosEjecucion[0].obtenerTiempoEstimado()):
+
+                self.agregarTerminados(self.procesosEjecucion.pop(0))
+                self.tablaListos.delete_row(1)
+
+                if(len(self.procesosListos) > 0):
+
+                    self.procesosEjecucion.append(self.procesosListos.pop(0))
+                    datosTemporales = self.procesosEjecucion[0].obtenerEjecucion()
+
+                    for i in range(len(datosTemporales)):
+
+                        self.tablaEjecucion.insert(1, i, datosTemporales[i])
 
     def calcularInicio(self):
 
@@ -87,13 +103,13 @@ class Lotes:
 
             datosTabla.append(Datos)
 
-        tabla = CTkTable(master = Frame,
+        self.tablaNuevos = CTkTable(master = Frame,
                          row = len(datosTabla),
                          column = len(datosTabla[0]),
                          values = datosTabla,
                          corner_radius = 0)
         
-        tabla.grid(row = 0, column = 0, sticky = "nsew") 
+        self.tablaNuevos.grid(row = 0, column = 0, sticky = "nsew") 
 
     def modificarListos(self, Frame):
 
@@ -116,13 +132,13 @@ class Lotes:
 
             datosTabla.append(Datos)
 
-        tabla = CTkTable(master = Frame,
+        self.tablaListos = CTkTable(master = Frame,
                          row = len(datosTabla),
                          column = len(datosTabla[0]),
                          values = datosTabla,
                          corner_radius = 0)
         
-        tabla.grid(row = 0, column = 0, sticky = "nsew")    
+        self.tablaListos.grid(row = 0, column = 0, sticky = "nsew")    
 
     def modificarEjecucion(self, Frame):
 
@@ -160,13 +176,19 @@ class Lotes:
 
         datosTabla = [["ID", "T/ Est", "T/ Eje", "1°N", "Op", "2°N", "Res"]]
 
-        tabla = CTkTable(master = Frame,
+        self.tablaTerminados = CTkTable(master = Frame,
                          row = len(datosTabla),
                          column = len(datosTabla[0]),
                          values = datosTabla,
                          corner_radius = 0)
         
-        tabla.grid(row = 0, column = 0, sticky = "nsew")    
+        self.tablaTerminados.grid(row = 0, column = 0, sticky = "nsew")   
+
+    def agregarTerminados(self, Informacion):
+
+        print(Informacion.obtenerTodo())
+
+        self.tablaTerminados.add_row(Informacion.obtenerTodo())
 
     def obtenerInput(self, Lote, Caracter):
 
