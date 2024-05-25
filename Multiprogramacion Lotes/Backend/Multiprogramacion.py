@@ -32,7 +32,7 @@ class Lotes:
     def detener(self):
 
         self._stop_event.set()
-        self.Contador.join()      
+        self.Contador.join(timeout=0)      
 
     def ejecutar(self, frameNuevos, frameListos, frameEjecucion, frameTerminados, frameTiempo, frameLotes):
 
