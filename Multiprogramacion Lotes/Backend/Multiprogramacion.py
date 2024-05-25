@@ -14,7 +14,10 @@ class Lotes:
         self.procesosEjecucion = []
         self.procesosBloqueados = []
         self.procesosTerminados = []
-        self.Tiempo = 0    
+        self.Tiempo = 0
+
+        self.Tecla = ""
+        self.Estado = True    
 
         self._stop_event = threading.Event()
         self.iniciar(frameNuevos, frameListos, frameEjecucion, frameTerminados, frameTiempo, frameLotes)
@@ -31,7 +34,7 @@ class Lotes:
 
     def ejecutar(self, frameNuevos, frameListos, frameEjecucion, frameTerminados, frameTiempo, frameLotes):
 
-        self.calcularInicio()
+        self.recalcular(frameLotes) # Carga los lotes en Listo y Ejecucion
         self.modificarNuevos(frameNuevos)
         self.modificarListos(frameListos)
         self.modificarEjecucion(frameEjecucion)
@@ -39,35 +42,47 @@ class Lotes:
 
         frameLotes.configure(text = " Lotes Retantes: {} ".format(self.cantidadLotes))
 
-        while not self._stop_event.is_set():
+        while (not self._stop_event.is_set()):
 
-            time.sleep(1)
+            while(self.Estado):
 
-            self.Tiempo += 1
-            frameTiempo.configure(text=" Reloj: {} ".format(str(self.Tiempo)))
+                time.sleep(1)
 
-            self.procesosEjecucion[0].asignarTiempoEjecutado(self.procesosEjecucion[0].obtenerTiempoEjecutado() + 1)
-            self.tablaEjecucion.insert(1,2,self.procesosEjecucion[0].obtenerTiempoEjecutado())
+                self.Tiempo += 1
+                frameTiempo.configure(text=" Reloj: {} ".format(str(self.Tiempo)))
 
-            #Al agotarse el tiempo de ejecucion hacer un swap mandar el ejecutado a terminado y uno de listo a ejecucion.
+                self.procesosEjecucion[0].asignarTiempoEjecutado(self.procesosEjecucion[0].obtenerTiempoEjecutado() + 1)
+                self.tablaEjecucion.insert(1,2,self.procesosEjecucion[0].obtenerTiempoEjecutado())
 
-            if(self.procesosEjecucion[0].obtenerTiempoEjecutado() >= self.procesosEjecucion[0].obtenerTiempoEstimado()):
+                #Al agotarse el tiempo de ejecucion hacer un swap mandar el ejecutado a terminado y uno de listo a ejecucion.
 
-                self.agregarTerminados(self.procesosEjecucion.pop(0))
-                self.tablaListos.delete_row(1)
+                if(self.procesosEjecucion[0].obtenerTiempoEjecutado() >= self.procesosEjecucion[0].obtenerTiempoEstimado()):
 
-                if(len(self.procesosListos) > 0):
+                    Estado = self.removerEjecutado(frameLotes)
 
-                    self.procesosEjecucion.append(self.procesosListos.pop(0))
-                    datosTemporales = self.procesosEjecucion[0].obtenerEjecucion()
+                    if(Estado): # Validar si el programa se acaba, en dado caso retorna verdadero
 
-                    for i in range(len(datosTemporales)):
+                        return
+                    
+                if(self.Tecla != None):
 
-                        self.tablaEjecucion.insert(1, i, datosTemporales[i])
+                    self.obtenerInput(self.Tecla, frameLotes)
 
-    def calcularInicio(self):
+                    self.Tecla == None                                    
+
+            if(self.Tecla != None):
+
+                self.obtenerInput(self.Tecla, frameLotes)
+
+                self.Tecla == None                                    
+                        
+    def recalcular(self, frameLotes):
 
        procesosDisponibles = len(self.procesosNuevos)
+
+       self.cantidadLotes -= 1
+
+       frameLotes.configure(text = " Lotes Retantes: {} ".format(self.cantidadLotes))
 
        if(procesosDisponibles >= 4): #Caso Especial de que tengo menos de 4 procesos.
 
@@ -84,6 +99,47 @@ class Lotes:
                 self.procesosListos.append(self.procesosNuevos.pop(0))
 
             self.procesosEjecucion.append(self.procesosListos.pop(0)) 
+
+    def removerEjecutado(self, frameLotes):
+    
+        self.agregarTerminados(self.procesosEjecucion.pop(0))
+
+        if(len(self.procesosListos) > 0):
+
+            self.tablaListos.delete_row(1)
+            self.procesosEjecucion.append(self.procesosListos.pop(0))
+            datosTemporales = self.procesosEjecucion[0].obtenerEjecuccion()
+
+            for i in range(len(datosTemporales)):
+
+                self.tablaEjecucion.insert(1, i, datosTemporales[i])
+
+        else:
+
+            if(len(self.procesosListos) <= 0 and len(self.procesosNuevos) <= 0): # Fin
+
+                self.tablaEjecucion.delete_row(1)
+                return True                
+                    
+            self.recalcular(frameLotes)
+            self.actualizarNuevos()
+            self.agregarListos()
+            self.actualizarEjecucion()  
+
+    def intercambiar(self):
+
+        if(len(self.procesosListos) > 0):
+
+            self.tablaListos.delete_row(1)
+            self.procesosEjecucion.append(self.procesosListos.pop(0))
+            datosTemporales = self.procesosEjecucion[0].obtenerEjecuccion()
+
+            for i in range(len(datosTemporales)):
+
+                self.tablaEjecucion.insert(1, i, datosTemporales[i])
+
+            datosTemporales = self.procesosEjecucion[0].obtenerEjecuccion()
+            self.tablaListos.add_row(datosTemporales) 
 
     def modificarNuevos(self, Frame):
 
@@ -109,6 +165,27 @@ class Lotes:
                          values = datosTabla,
                          corner_radius = 0)
         
+        '''
+        
+        for i in range(len(datosTabla)):
+
+            Color = None
+            Fila = i + 1
+
+            if((Fila // 4) % 2 == 0):
+
+                Color = "Blue"
+
+            else:    
+
+                Color = "Red"
+
+            for j in range(len(datosTabla[0])):
+
+               self.tablaNuevos.insert(row = Fila, column = j, value = self.tablaNuevos.get(Fila, j), fg_color = Color)
+
+        '''        
+
         self.tablaNuevos.grid(row = 0, column = 0, sticky = "nsew") 
 
     def modificarListos(self, Frame):
@@ -186,20 +263,53 @@ class Lotes:
 
     def agregarTerminados(self, Informacion):
 
-        print(Informacion.obtenerTodo())
-
         self.tablaTerminados.add_row(Informacion.obtenerTodo())
 
-    def obtenerInput(self, Lote, Caracter):
+    def agregarListos(self):
 
-        if(Caracter == "W"):
-            pass
+        for i in range(len(self.procesosListos)):
 
-        elif(Caracter == "E"):
-            pass
+            self.tablaListos.add_row(self.procesosListos[i].obtenerEjecuccion())
+
+    def actualizarNuevos(self):
+
+        cantidadIngresada = len(self.procesosListos) + len(self.procesosEjecucion)
+
+        for i in range(cantidadIngresada):
+
+            self.tablaNuevos.delete_row(1)
+
+    def actualizarEjecucion(self):
+
+        self.tablaEjecucion.delete_row(1)
+        self.tablaEjecucion.add_row(self.procesosEjecucion[0].obtenerEjecuccion())   
+
+    def estadoError(self):
+
+        pass
+
+    def obtenerInput(self, Caracter, frameLotes):
+
+        Caracter = Caracter.upper()
+
+        if(Caracter == "W" and self.Estado):
+            
+            self.procesosEjecucion[0].asignarResultado("ERROR")
+            self.removerEjecutado(frameLotes)
+
+        elif(Caracter == "E"  and self.Estado):
+
+            self.intercambiar()
 
         elif(Caracter == "P"):
-            pass
+
+            self.Estado = False
 
         elif(Caracter == "C"):   
-            pass 
+
+            self.Estado = True
+
+    def asignarTecla(self, Tecla):
+
+        self.Tecla = Tecla
+        print(self.Tecla)    
