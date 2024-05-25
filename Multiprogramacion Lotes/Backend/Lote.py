@@ -5,7 +5,7 @@ class Lote:
     def __init__(self, Numero):
 
         self.ID = Numero
-        self.tiempoEstimado = random.randint(5, 18)
+        self.tiempoEstimado = random.randint(5, 10)
         self.tiempoEjecutado = 0
         self.primerOperando = random.randint(1, 10000)
         self.segundoOperando = random.randint(1, 10000)
@@ -88,9 +88,26 @@ class Lote:
 
         self.ID = Cantidad
 
+    def asignarResultado(self, Parametro):
+
+        self.Resultado = Parametro        
+
     def asignarTiempoEjecutado(self, Cantidad):
 
         self.tiempoEjecutado = Cantidad
+
+    def obtenerEjecuccion(self):
+
+        Temporal = []
+
+        Temporal.append(self.obtenerID())
+        Temporal.append(self.obtenerTiempoEstimado())
+        Temporal.append(self.obtenerTiempoEjecutado())
+        Temporal.append(self.obtenerPrimerOperando()) 
+        Temporal.append(self.obtenerOperacion())
+        Temporal.append(self.obtenerSegundoOperando())
+
+        return Temporal        
 
     def obtenerTodo(self):
 
@@ -102,5 +119,6 @@ class Lote:
         Temporal.append(self.obtenerPrimerOperando()) 
         Temporal.append(self.obtenerOperacion())
         Temporal.append(self.obtenerSegundoOperando())
+        Temporal.append(self.obtenerResultado())
 
         return Temporal
