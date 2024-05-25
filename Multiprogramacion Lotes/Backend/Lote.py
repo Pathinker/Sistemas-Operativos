@@ -2,8 +2,9 @@ import random
 
 class Lote:
 
-    def __init__(self, Numero):
+    def __init__(self, Numero, Lote):
 
+        self.Lote = Lote
         self.ID = Numero
         self.tiempoEstimado = random.randint(5, 10)
         self.tiempoEjecutado = 0
@@ -56,6 +57,10 @@ class Lote:
 
             return primerOperando % segundoOperando
         
+    def obtenerLote(self):
+
+        return self.Lote    
+        
     def obtenerID(self):
 
         return self.ID    
@@ -100,6 +105,7 @@ class Lote:
 
         Temporal = []
 
+        Temporal.append(self.obtenerLote())
         Temporal.append(self.obtenerID())
         Temporal.append(self.obtenerTiempoEstimado())
         Temporal.append(self.obtenerTiempoEjecutado())
@@ -113,6 +119,7 @@ class Lote:
 
         Temporal = []
 
+        Temporal.append(self.obtenerLote())
         Temporal.append(self.obtenerID())
         Temporal.append(self.obtenerTiempoEstimado())
         Temporal.append(self.obtenerTiempoEjecutado())
