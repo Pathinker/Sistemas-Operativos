@@ -9,12 +9,14 @@ class Lotes:
     def __init__(self, Cantidad, frameNuevos, frameListos, frameEjecucion, frameTerminados, frameTiempo, frameLotes):
 
         self.cantidadLotes = Cantidad // 4 + 1
-        self.procesosNuevos = [Lote.Lote(i) for i in range(Cantidad)]
+        self.procesosNuevos = [Lote.Lote(i, (i + 4) // 4) for i in range(Cantidad)]
         self.procesosListos = []
         self.procesosEjecucion = []
         self.procesosBloqueados = []
         self.procesosTerminados = []
         self.Tiempo = 0
+
+        self.fondoAzul = "#1565C0"
 
         self.Tecla = ""
         self.Estado = True    
@@ -52,7 +54,7 @@ class Lotes:
                 frameTiempo.configure(text=" Reloj: {} ".format(str(self.Tiempo)))
 
                 self.procesosEjecucion[0].asignarTiempoEjecutado(self.procesosEjecucion[0].obtenerTiempoEjecutado() + 1)
-                self.tablaEjecucion.insert(1,2,self.procesosEjecucion[0].obtenerTiempoEjecutado())
+                self.tablaEjecucion.insert(1,3,self.procesosEjecucion[0].obtenerTiempoEjecutado())
 
                 #Al agotarse el tiempo de ejecucion hacer un swap mandar el ejecutado a terminado y uno de listo a ejecucion.
 
@@ -152,12 +154,13 @@ class Lotes:
         Frame.columnconfigure(0, weight = 1)
 
         Valores = self.procesosNuevos
-        datosTabla = [["ID", "T/ Estimado", "T/ Ejecutado"]]
+        datosTabla = [["Lote", "ID", "T/ Estimado", "T/ Ejecutado"]]
 
         for i in  Valores:
 
             Datos = []
 
+            Datos.append(i.obtenerLote())
             Datos.append(i.obtenerID())
             Datos.append(i.obtenerTiempoEstimado())
             Datos.append(i.obtenerTiempoEjecutado())
@@ -167,30 +170,10 @@ class Lotes:
         self.tablaNuevos = CTkTable(master = Frame,
                          row = len(datosTabla),
                          column = len(datosTabla[0]),
+                         header_color = self.fondoAzul,
                          values = datosTabla,
                          corner_radius = 0)
         
-        '''
-        
-        for i in range(len(datosTabla)):
-
-            Color = None
-            Fila = i + 1
-
-            if((Fila // 4) % 2 == 0):
-
-                Color = "Blue"
-
-            else:    
-
-                Color = "Red"
-
-            for j in range(len(datosTabla[0])):
-
-               self.tablaNuevos.insert(row = Fila, column = j, value = self.tablaNuevos.get(Fila, j), fg_color = Color)
-
-        '''        
-
         self.tablaNuevos.grid(row = 0, column = 0, sticky = "nsew") 
 
     def modificarListos(self, Frame):
@@ -199,12 +182,13 @@ class Lotes:
         Frame.columnconfigure(0, weight = 1)
 
         Valores = self.procesosListos
-        datosTabla = [["ID", "T/ Est", "T/ Eje", "1°N", "Op", "2°N"]]
+        datosTabla = [["Lote", "ID", "T/ Est", "T/ Eje", "1°N", "Op", "2°N"]]
 
         for i in  Valores:
 
             Datos = []
 
+            Datos.append(i.obtenerLote())
             Datos.append(i.obtenerID())
             Datos.append(i.obtenerTiempoEstimado())
             Datos.append(i.obtenerTiempoEjecutado())
@@ -217,10 +201,11 @@ class Lotes:
         self.tablaListos = CTkTable(master = Frame,
                          row = len(datosTabla),
                          column = len(datosTabla[0]),
+                         header_color = self.fondoAzul,
                          values = datosTabla,
                          corner_radius = 0)
         
-        self.tablaListos.grid(row = 0, column = 0, sticky = "nsew")    
+        self.tablaListos.grid(row = 0, column = 0, sticky = "nsew", pady = (6,0), padx = (6, 0))    
 
     def modificarEjecucion(self, Frame):
 
@@ -228,12 +213,13 @@ class Lotes:
         Frame.columnconfigure(0, weight = 1)
 
         Valores = self.procesosEjecucion
-        datosTabla = [["ID", "T/ Est", "T/ Eje", "1°N", "Op", "2°N"]]
+        datosTabla = [["Lote", "ID", "T/ Est", "T/ Eje", "1°N", "Op", "2°N"]]
 
         for i in  Valores:
 
             Datos = []
 
+            Datos.append(i.obtenerLote())
             Datos.append(i.obtenerID())
             Datos.append(i.obtenerTiempoEstimado())
             Datos.append(i.obtenerTiempoEjecutado())
@@ -246,21 +232,23 @@ class Lotes:
         self.tablaEjecucion = CTkTable(master = Frame,
                          row = len(datosTabla),
                          column = len(datosTabla[0]),
+                         header_color = self.fondoAzul,
                          values = datosTabla,
                          corner_radius = 0)
         
-        self.tablaEjecucion.grid(row = 0, column = 0, sticky = "nsew")    
+        self.tablaEjecucion.grid(row = 0, column = 0, sticky = "nsew", pady = (6,0), padx = (6, 0))    
        
     def modificarTerminados(self, Frame):
 
         Frame.rowconfigure(0, weight = 1)
         Frame.columnconfigure(0, weight = 1)
 
-        datosTabla = [["ID", "T/ Est", "T/ Eje", "1°N", "Op", "2°N", "Res"]]
+        datosTabla = [["Lote", "ID", "T/ Est", "T/ Eje", "1°N", "Op", "2°N", "Res"]]
 
         self.tablaTerminados = CTkTable(master = Frame,
                          row = len(datosTabla),
                          column = len(datosTabla[0]),
+                         header_color = self.fondoAzul,
                          values = datosTabla,
                          corner_radius = 0)
         
