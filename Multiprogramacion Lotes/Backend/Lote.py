@@ -6,7 +6,7 @@ class Lote:
 
         self.Lote = Lote
         self.ID = Numero
-        self.tiempoEstimado = random.randint(5, 10)
+        self.tiempoEstimado = random.randint(5, 18)
         self.tiempoEjecutado = 0
         self.primerOperando = random.randint(1, 10000)
         self.segundoOperando = random.randint(1, 10000)
