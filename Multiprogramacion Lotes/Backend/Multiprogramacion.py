@@ -68,13 +68,13 @@ class Lotes:
 
                     self.obtenerInput(self.Tecla, frameLotes)
 
-                    self.Tecla == None                                    
+                    self.Tecla = None                                    
 
             if(self.Tecla != None):
 
                 self.obtenerInput(self.Tecla, frameLotes)
 
-                self.Tecla == None                                    
+                self.Tecla = None                                    
                         
     def recalcular(self, frameLotes):
 
@@ -130,16 +130,21 @@ class Lotes:
 
         if(len(self.procesosListos) > 0):
 
+            #Agregar el dato en ejecucion a listos
+
             self.tablaListos.delete_row(1)
+            datosTemporales = self.procesosEjecucion[0].obtenerEjecuccion()
+            self.procesosListos.append(self.procesosEjecucion.pop(0))
+            self.tablaListos.add_row(datosTemporales) 
+
+            #Agregar el siguiente dato a ejecucion
+
             self.procesosEjecucion.append(self.procesosListos.pop(0))
             datosTemporales = self.procesosEjecucion[0].obtenerEjecuccion()
 
             for i in range(len(datosTemporales)):
 
                 self.tablaEjecucion.insert(1, i, datosTemporales[i])
-
-            datosTemporales = self.procesosEjecucion[0].obtenerEjecuccion()
-            self.tablaListos.add_row(datosTemporales) 
 
     def modificarNuevos(self, Frame):
 
