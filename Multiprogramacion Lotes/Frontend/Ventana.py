@@ -412,15 +412,15 @@ class Ventana:
         Contenido.insert("4.0", "W: Error\n")
         Contenido.insert("5.0", "P: Pausa\n")
         Contenido.insert("6.0", "C: Continuar\n\n")
-        Contenido.insert("8.0", "Las teclas seran detectadas al presionar [Enter]\n\n")
+        #Contenido.insert("8.0", "Las teclas seran detectadas al presionar [Enter]\n\n")
 
-        Contenido.bind("<Return>", lambda event: self.Enter(event))
+        Contenido.bind("<KeyPress>", lambda event: self.Enter(event.char))
 
         Titulo.grid(row = 0, column = 0, sticky = "nsew")
         Contenido.grid(row = 1, column = 0, sticky = "nsew")    
 
     def Enter(self, Caracter):
 
-        print(Caracter)
+        self.Multiprogramacion.asignarTecla(Caracter)
 
         #Implementar las opciones con el backend.   
