@@ -23,21 +23,25 @@ class Ventana:
         self.primerGris = "#19191a"
         self.segundoGris = "#4A4A4D"
         self.textoGris = "#c6c6c6"
+        
+        self.fondoAzul = "#1565C0"
 
         self.app.protocol("WM_DELETE_WINDOW", self.cerrarVentana)
     
-        self.generarFrames(self.app)
-        self.Multiprogramacion = Multiprogramacion.Lotes(10, self.nuevosContenedor,
-                                                         self.listosContenedor,
-                                                         self.ejecucionContenedor,
-                                                         self.terminadosContenedor,
-                                                         self.tituloReloj,
-                                                         self.tituloPendientes)
+        self.pantallaInicio(self.app)
+                 
         self.app.mainloop()
 
     def cerrarVentana(self):
 
-        self.Multiprogramacion.detener()
+        try:
+
+            self.Multiprogramacion.detener()
+
+        except:
+
+            pass
+
         self.app.destroy()    
     
     def obtenerAncho(self, Ventana, Proporcion):
@@ -55,7 +59,119 @@ class Ventana:
     def obtenerEscala(self, Ventana, Longitud):
 
         return Ventana * Longitud // 100
+    
+    def pantallaInicio(self, Frame):
 
+        Frame.rowconfigure(0, weight = 1)
+        Frame.columnconfigure(0, weight = 1)
+
+        anchoFrame = self.obtenerEscala(self.ventanaAncho, 100)
+        largoFrame = self.obtenerEscala(self.ventanaLargo, 100)
+
+        Fondo = CTkFrame(master = Frame,
+                         width = anchoFrame,
+                         height = largoFrame,
+                         fg_color = self.fondoAzul,
+                         corner_radius = 0)
+        
+        Fondo.grid(row = 0, column = 0, sticky = "nsew")
+
+        Fondo.rowconfigure(0, weight = 1)
+        Fondo.columnconfigure(0, weight = 1)
+
+        anchoContenido = self.obtenerEscala(anchoFrame, 40)
+        largoContenido = self.obtenerEscala(largoFrame, 40)
+
+        contenidoFrame = CTkFrame(master = Fondo,
+                                  width = anchoContenido,
+                                  height = largoContenido,
+                                  fg_color = self.primerGris,
+                                  corner_radius = 0)
+        
+        contenidoFrame.grid(row = 0, column = 0)
+
+        contenidoFrame.rowconfigure(0, weight = 1)
+        contenidoFrame.rowconfigure(1, weight = 1)
+        contenidoFrame.rowconfigure(2, weight = 1)
+        contenidoFrame.columnconfigure(0, weight = 1)
+
+        cantidadFrameAncho = self.obtenerEscala(anchoContenido, 100)
+        cantidadFrameLargo = self.obtenerEscala(largoContenido, 40)
+
+        botonFrameAncho = self.obtenerEscala(anchoContenido, 100)
+        botonFrameLargo = self.obtenerEscala(largoContenido, 40)
+
+        texto = CTkLabel(master = contenidoFrame,
+                         width = self.obtenerEscala(anchoContenido, 100),
+                         height = self.obtenerEscala(largoContenido, 20),
+                         text = "Multiprogramación Lotes",
+                         font = ("Helvetica", 32))
+        
+        cantidadFrame = CTkFrame(master = contenidoFrame,
+                                 width = cantidadFrameAncho,
+                                 height = cantidadFrameLargo,
+                                 corner_radius = 0
+                                 )
+        
+        botonFrame = CTkFrame(master = contenidoFrame,
+                              width = botonFrameAncho,
+                              height = botonFrameLargo,
+                              corner_radius = 0)
+        
+        cantidadFrame.grid_propagate(False)
+        botonFrame.grid_propagate(False)
+        
+        texto.grid(row = 0, column = 0, sticky = "nsew")
+        cantidadFrame.grid(row = 1, column = 0, sticky = "nsew")
+        botonFrame.grid(row = 2, column = 0, sticky = "nsew")
+        
+        cantidadFrame.rowconfigure(0, weight = 1)
+        cantidadFrame.columnconfigure(0, weight = 1)
+
+        botonFrame.rowconfigure(0, weight = 1)
+        botonFrame.columnconfigure(0, weight = 1)
+
+        cantidad = CTkEntry(master = cantidadFrame,
+                            width =self.obtenerEscala(50, cantidadFrameAncho),
+                            height = self.obtenerEscala(20,  cantidadFrameLargo),
+                            placeholder_text = "Cantidad Procesos",
+                            font = ("Helvetica", 16),
+                            corner_radius = 0)
+        
+        boton = CTkButton(master = botonFrame,
+                           width = self.obtenerEscala(botonFrameAncho, 50),
+                           height = self.obtenerEscala(botonFrameLargo, 40),
+                           fg_color = self.fondoAzul,
+                           text = "Crear",
+                           font =("Helvetica", 16),
+                           command = lambda : self.continuar(cantidad),
+                           corner_radius = 0)
+
+        cantidad.grid(row = 0, column = 0, sticky = "s", pady = (10,10))
+        boton.grid(row = 0, column = 0, sticky = "n", pady = (10, 10))
+
+    def continuar(self, Widget):
+
+        valor = int(Widget.get())
+
+        if(valor <= 0):
+
+            return
+
+        for widget in self.app.winfo_children():
+
+            widget.destroy() 
+
+        self.generarFrames(self.app)
+
+        self.Multiprogramacion = Multiprogramacion.Lotes(valor, 
+                                                         self.nuevosContenedor,
+                                                         self.listosContenedor,
+                                                         self.ejecucionContenedor,
+                                                         self.terminadosContenedor,
+                                                         self.tituloReloj,
+                                                         self.tituloPendientes)
+                                                
     def generarFrames(self, Ventana):
 
         Ventana.rowconfigure(0, weight = 1)
@@ -421,6 +537,6 @@ class Ventana:
 
     def Enter(self, Caracter):
 
-        self.Multiprogramacion.asignarTecla(Caracter)
+        #Opciones del Backend
 
-        #Implementar las opciones con el backend.   
+        self.Multiprogramacion.asignarTecla(Caracter) 
