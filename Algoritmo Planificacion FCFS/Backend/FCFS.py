@@ -49,33 +49,64 @@ class sistemOperativo:
 
             while(self.Estado):
 
-                if(self.procesosEjecucion[0].obtenerTiempoRespuesta() == None):
+                if(len(self.procesosEjecucion) > 0): #Validar que no tenga todos bloqueados
 
-                    self.procesosEjecucion[0].asignarTiempoRespuesta(self.Tiempo)                
+                    if(self.procesosEjecucion[0].obtenerTiempoRespuesta() == None):
+
+                        self.procesosEjecucion[0].asignarTiempoRespuesta(self.Tiempo)                
 
                 time.sleep(1)
 
                 self.Tiempo += 1
-                frameTiempo.configure(text=" Reloj: {} ".format(str(self.Tiempo)))                    
+                frameTiempo.configure(text=" Reloj: {} ".format(str(self.Tiempo)))     
 
-                self.procesosEjecucion[0].asignarTiempoEjecutado(self.procesosEjecucion[0].obtenerTiempoEjecutado() + 1)
-                self.tablaEjecucion.insert(1,2,self.procesosEjecucion[0].obtenerTiempoEjecutado())
+                if(len(self.procesosEjecucion) > 0): #Validar que no tenga todos bloqueados              
+
+                    self.procesosEjecucion[0].asignarTiempoEjecutado(self.procesosEjecucion[0].obtenerTiempoEjecutado() + 1)
+                    self.tablaEjecucion.insert(1,2,self.procesosEjecucion[0].obtenerTiempoEjecutado())
+
+                #Actualizar el tiempo de bloqueo si es que existen
+
+                if(len(self.procesosBloqueados) > 0 ):
+
+                    indices = []
+
+                    for i in range(len(self.procesosBloqueados)):
+
+                        tiempoTranscurrido = self.procesosBloqueados[i].obtenerTiempoBloqueado()
+                        tiempoTranscurrido += 1
+
+                        self.procesosBloqueados[i].asignarTiempoBloqueado(tiempoTranscurrido)
+                        self.tablaBloqueados.insert(i + 1, 1, self.procesosBloqueados[i].obtenerTiempoBloqueado())
+
+                        if(self.procesosBloqueados[i].obtenerTiempoBloqueado() >= 8):
+
+                            indices.append(i)
+                            self.procesosBloqueados[i].asignarTiempoBloqueado(0)    
+
+                    #Se ejecuta unicamente si esxisten procesos bloqueados susceptibles de ser retornados.
+
+                    for i in range(len(indices)):
+
+                        self.moverListos(indices)
 
                 #Al agotarse el tiempo de ejecucion hacer un swap mandar el ejecutado a terminado y uno de listo a ejecucion.
 
-                if(self.procesosEjecucion[0].obtenerTiempoEjecutado() >= self.procesosEjecucion[0].obtenerTiempoEstimado()):
+                if(len(self.procesosEjecucion) > 0): #Validar que no tenga todos bloqueados     
 
-                    Estado = self.removerEjecutado(frameProcesos)
+                    if(self.procesosEjecucion[0].obtenerTiempoEjecutado() >= self.procesosEjecucion[0].obtenerTiempoEstimado()):
 
-                    if(Estado): # Validar si el programa se acaba, en dado caso retorna verdadero
+                        Estado = self.removerEjecutado(frameProcesos)
 
-                        return
-                    
-                if(self.Tecla != None):
+                        if(Estado): # Validar si el programa se acaba, en dado caso retorna verdadero
 
-                    self.obtenerInput(self.Tecla, frameProcesos)
+                            return
+                        
+                    if(self.Tecla != None):
 
-                    self.Tecla = None                                    
+                        self.obtenerInput(self.Tecla, frameProcesos)
+
+                        self.Tecla = None                                    
 
             if(self.Tecla != None):
 
@@ -139,23 +170,23 @@ class sistemOperativo:
         
     def intercambiar(self):
 
+        self.procesosBloqueados.append(self.procesosEjecucion.pop(0))
+        self.tablaEjecucion.delete_row(1)
+
+        self.actualizarBloqueado()
+
         if(len(self.procesosListos) > 0):
 
-            #Agregar el dato en ejecucion a listos
+            #Actualizo mi tabla
 
             self.tablaListos.delete_row(1)
-            datosTemporales = self.procesosEjecucion[0].obtenerEjecuccion()
-            self.procesosListos.append(self.procesosEjecucion.pop(0))
-            self.tablaListos.add_row(datosTemporales) 
 
             #Agregar el siguiente dato a ejecucion
 
             self.procesosEjecucion.append(self.procesosListos.pop(0))
             datosTemporales = self.procesosEjecucion[0].obtenerEjecuccion()
 
-            for i in range(len(datosTemporales)):
-
-                self.tablaEjecucion.insert(1, i, datosTemporales[i])
+            self.tablaEjecucion.add_row(datosTemporales)
 
     def modificarNuevos(self, Frame):
 
@@ -296,6 +327,21 @@ class sistemOperativo:
 
         self.tablaEjecucion.delete_row(1)
         self.tablaEjecucion.add_row(self.procesosEjecucion[0].obtenerEjecuccion())   
+
+    def actualizarBloqueado(self):
+
+        datosTemporales = self.procesosBloqueados[len(self.procesosBloqueados) - 1].obtenerBloqueado()
+
+        self.tablaBloqueados.add_row(datosTemporales)
+
+    def moverListos(self, indices):
+
+        for i in range(len(indices)):
+
+            self.procesosListos.append(self.procesosBloqueados.pop(0))
+            self.tablaBloqueados.delete_row(1)
+
+            self.tablaListos.add_row(self.procesosListos[len(self.procesosListos)-1].obtenerEjecuccion())    
 
     def obtenerInput(self, Caracter, frameProcesos):
 
