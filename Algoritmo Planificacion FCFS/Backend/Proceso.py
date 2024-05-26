@@ -15,6 +15,8 @@ class Proceso:
         self.tiempoEspera = 0
         self.tiempoServicio = 0
 
+        self.tiempoBloqueado = 0
+
         self.primerOperando = random.randint(1, 10000)
         self.segundoOperando = random.randint(1, 10000)
         self.Operacion = self.obtenerOperando(random.randint(1, 5))
@@ -116,6 +118,10 @@ class Proceso:
 
         return self.Resultado
     
+    def obtenerTiempoBloqueado(self):
+
+        return self.tiempoBloqueado
+    
     def asignarID(self, Parametro):
 
         self.ID = Parametro
@@ -152,6 +158,10 @@ class Proceso:
 
         self.tiempoServicio = Parametro
 
+    def asignarTiempoBloqueado(self, Parametro):
+
+        self.tiempoBloqueado = Parametro    
+
     def obtenerEjecuccion(self):
 
         Temporal = []
@@ -163,7 +173,16 @@ class Proceso:
         Temporal.append(self.obtenerOperacion())
         Temporal.append(self.obtenerSegundoOperando())
 
-        return Temporal        
+        return Temporal      
+
+    def obtenerBloqueado(self):
+
+        Temporal = []
+
+        Temporal.append(self.obtenerID())
+        Temporal.append(self.obtenerTiempoBloqueado())
+
+        return Temporal  
 
     def obtenerTodo(self):
 
