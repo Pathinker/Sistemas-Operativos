@@ -3,7 +3,7 @@ from CTkTable import *
 from PIL import Image
 import time
 
-from Backend import Multiprogramacion
+from Backend import FCFS
 
 class Ventana:
 
@@ -13,9 +13,11 @@ class Ventana:
         self.ventanaAncho = self.obtenerAncho(self.app, 70)
         self.ventanaLargo = self.obtenerLargo(self.app, 70)
         self.app.after(201, lambda : self.app.iconbitmap("Frontend/Imagenes/Icono.ico"))
-        self.app.title("Multiprogramación Lotes")
+        self.app.title("Algoritmo Planificación FCFS")
 
         self.app.geometry(f"{self.ventanaAncho}x{self.ventanaLargo}")
+        #self.app.attributes("-fullscreen", True)
+
 
         #Paleta Colores
 
@@ -36,7 +38,7 @@ class Ventana:
 
         try:
 
-            self.Multiprogramacion.detener()
+            self.Servicio.detener()
 
         except:
 
@@ -104,7 +106,7 @@ class Ventana:
         texto = CTkLabel(master = contenidoFrame,
                          width = self.obtenerEscala(anchoContenido, 100),
                          height = self.obtenerEscala(largoContenido, 20),
-                         text = "Multiprogramación Lotes",
+                         text = "Algoritmo Planificación FCFS",
                          font = ("Helvetica", 32))
         
         cantidadFrame = CTkFrame(master = contenidoFrame,
@@ -147,8 +149,8 @@ class Ventana:
                            command = lambda : self.continuar(cantidad),
                            corner_radius = 0)
 
-        cantidad.grid(row = 0, column = 0, sticky = "s", pady = (10,10))
-        boton.grid(row = 0, column = 0, sticky = "n", pady = (10, 10))
+        cantidad.grid(row = 0, column = 0, sticky = "s", pady = (0,10))
+        boton.grid(row = 0, column = 0, sticky = "n", pady = (10, 0))
 
     def continuar(self, Widget):
 
@@ -164,10 +166,11 @@ class Ventana:
 
         self.generarFrames(self.app)
 
-        self.Multiprogramacion = Multiprogramacion.Lotes(valor, 
+        self.Servicio = FCFS.sistemOperativo(valor, 
                                                          self.nuevosContenedor,
                                                          self.listosContenedor,
                                                          self.ejecucionContenedor,
+                                                         self.bloqueadosContenedor,
                                                          self.terminadosContenedor,
                                                          self.tituloReloj,
                                                          self.tituloPendientes)
@@ -205,18 +208,24 @@ class Ventana:
         Frame.columnconfigure(1, weight = 1)
         Frame.columnconfigure(2, weight = 1)
 
-        contenedoresAncho = self.obtenerEscala(Ancho, 33)
+        nuevosAncho = self.obtenerEscala(Ancho, 10)
+        nuevosLargo = self.obtenerEscala(Largo, 100)
+
+        pendientesAncho = self.obtenerEscala(Ancho, 30)
+        pendientesLargo = self.obtenerEscala(Largo, 100)
+
+        contenedoresAncho = self.obtenerEscala(Ancho, 60)
         contenedoresLargo = self.obtenerEscala(Largo, 100)
 
         Nuevos = CTkFrame(master = Frame,
-                       width = contenedoresAncho,
-                       height = contenedoresLargo,
+                       width = nuevosAncho,
+                       height = nuevosLargo,
                        fg_color = self.colorFondo
                        )
         
         Pendientes = CTkFrame(master = Frame,
-                              width = contenedoresAncho,
-                              height = contenedoresLargo,
+                              width = pendientesAncho,
+                              height = pendientesLargo,
                               fg_color = "#2B2B2B")
 
         Terminados = CTkFrame(master = Frame,
@@ -229,8 +238,8 @@ class Ventana:
         Pendientes.grid(row = 0, column = 1, sticky = "nsew", padx = 20)
         Terminados.grid(row = 0, column = 2, sticky = "nsew")
 
-        self.generarNuevos(Nuevos, contenedoresAncho, contenedoresLargo)
-        self.generarPendientes(Pendientes, contenedoresAncho, contenedoresLargo)
+        self.generarNuevos(Nuevos, nuevosAncho, nuevosLargo)
+        self.generarPendientes(Pendientes, pendientesAncho, pendientesLargo)
         self.generarTerminados(Terminados, contenedoresAncho, contenedoresLargo)
 
     def generarNuevos(self, Frame, Ancho, Largo):
@@ -257,22 +266,25 @@ class Ventana:
         encabezado.grid(row = 0, column = 0, sticky = "nsew")
         self.nuevosContenedor.grid(row = 1, column = 0, sticky = "nsew")
 
-        #Modificar el contenedor encabezado para contener los lotes restantes.
+        #Modificar el contenedor encabezado para contener los procesos restantes.
 
         encabezado.rowconfigure(0, weight = 1)
         encabezado.columnconfigure(0, weight = 1)
         encabezado.columnconfigure(1, weight = 1)
 
-        tituloAncho = self.obtenerEscala(encabezadoAncho, 50)
-        tituloLargo = self.obtenerEscala(encabezadoLargo, 100)
+        tituloNuevoAncho = self.obtenerEscala(encabezadoAncho, 30)
+        tituloNuevoLargo = self.obtenerEscala(encabezadoLargo, 100)
+
+        tituloProcesosAncho = self.obtenerEscala(encabezadoAncho, 70)
+        tituloProcesosLargo = self.obtenerEscala(encabezadoLargo, 100)
 
         imagenNuevos = CTkImage(light_image = Image.open("Frontend/Imagenes/Nuevos.png"),
                           dark_image = Image.open("Frontend/Imagenes/Nuevos.png"),
                           size = (16, 16))
         
         tituloNuevo = CTkLabel(master = encabezado,
-                          width = tituloAncho,
-                          height = tituloLargo,
+                          width = tituloNuevoAncho,
+                          height = tituloNuevoLargo,
                           fg_color = self.primerGris,
                           text = " Nuevos",
                           font = ("Helvetica", 14),
@@ -285,10 +297,10 @@ class Ventana:
                           size = (16, 16))
         
         self.tituloPendientes = CTkLabel(master = encabezado,
-                          width = tituloAncho,
-                          height = tituloLargo,
+                          width = tituloProcesosAncho,
+                          height = tituloProcesosLargo,
                           fg_color = self.primerGris,
-                          text = " Lotes Retantes: ",
+                          text = " Procesos Restantes: ",
                           font = ("Helvetica", 14),
                           anchor = "e",
                           image = imagenRestantes,
@@ -301,13 +313,17 @@ class Ventana:
 
         Frame.rowconfigure(0, weight = 1)
         Frame.rowconfigure(1, weight = 1)
+        Frame.rowconfigure(2, weight = 1)
         Frame.columnconfigure(0, weight = 1)
 
         listosAncho = self.obtenerEscala(Ancho, 100)
-        listosLargo = self.obtenerEscala(Largo, 60)
+        listosLargo = self.obtenerEscala(Largo, 33)
 
         ejecucionAncho = self.obtenerEscala(Ancho, 100)
-        ejecucionLargo = self.obtenerEscala(Largo, 40)
+        ejecucionLargo = self.obtenerEscala(Largo, 33)
+
+        bloqueadoAncho = self.obtenerEscala(Ancho, 100)
+        bloqueadoLargo = self.obtenerEscala(Largo, 33)
 
         Listos = CTkFrame(master = Frame,
                           width = listosAncho,
@@ -321,11 +337,18 @@ class Ventana:
                              corner_radius = 0
                              )
         
+        Bloqueados = CTkFrame(master = Frame,
+                              width = bloqueadoAncho,
+                              height = bloqueadoLargo,
+                              corner_radius = 0)
+        
         Listos.grid(row = 0, column = 0, sticky = "nsew", pady = (0, 5))
         Ejecucion.grid(row = 1, column = 0, sticky = "nsew")
+        Bloqueados.grid(row = 2, column = 0, sticky = "nsew", pady =(5, 0))
 
         self.generarListos(Listos, listosAncho, listosLargo)
         self.generarEjecucion(Ejecucion, ejecucionAncho, ejecucionLargo)
+        self.generarBloqueados(Bloqueados, bloqueadoAncho, bloqueadoLargo)
 
     def generarListos(self, Frame, Ancho, Largo):
 
@@ -403,7 +426,7 @@ class Ventana:
         encabezado.grid(row = 0, column = 0, sticky = "nsew")
         self.ejecucionContenedor.grid(row = 1, column = 0, sticky = "nsew")
 
-        #Modificar el contenedor encabezado para contener los lotes restantes.
+        #Modificar el contenedor encabezado para contener los procesos restantes.
 
         encabezado.rowconfigure(0, weight = 1)
         encabezado.columnconfigure(0, weight = 1)
@@ -425,7 +448,57 @@ class Ventana:
                           image = imagenEjecucion,
                           compound = "left")
         
-        tituloEjecucion.grid(row = 0, column = 0, sticky = "nsew")    
+        tituloEjecucion.grid(row = 0, column = 0, sticky = "nsew")  
+
+    def generarBloqueados(self, Frame, Ancho, Largo):
+
+        Frame.rowconfigure(0, weight = 0)
+        Frame.rowconfigure(1, weight = 1)
+        Frame.columnconfigure(0, weight = 1)    
+
+        encabezadoAncho = self.obtenerEscala(Ancho, 100)
+        encabezadoLargo = self.obtenerEscala(Largo, 5)
+
+        bloqueadosAncho = self.obtenerEscala(Ancho, 100)
+        bloqueadosLargo = self.obtenerEscala(Largo, 95)
+
+        encabezado = CTkFrame(master = Frame,
+                          width = encabezadoAncho,
+                          height = encabezadoLargo,
+                          corner_radius = 0)
+        
+        self.bloqueadosContenedor = CTkScrollableFrame(master = Frame,
+                                              width = bloqueadosAncho,
+                                              height = bloqueadosLargo,
+                                              fg_color = self.colorFondo,
+                                              corner_radius = 0)
+        
+        encabezado.grid(row = 0, column = 0, sticky = "nsew")
+        self.bloqueadosContenedor.grid(row = 1, column = 0, sticky = "nsew")
+
+        #Modificar el contenedor encabezado para contener los procesos restantes.
+
+        encabezado.rowconfigure(0, weight = 1)
+        encabezado.columnconfigure(0, weight = 1)
+
+        tituloAncho = self.obtenerEscala(encabezadoAncho, 100)
+        tituloLargo = self.obtenerEscala(encabezadoLargo, 100)
+
+        imagenEjecucion = CTkImage(light_image = Image.open("Frontend/Imagenes/Ejecucion.png"),
+                          dark_image = Image.open("Frontend/Imagenes/Ejecucion.png"),
+                          size = (16, 16))
+        
+        tituloEjecucion = CTkLabel(master = encabezado,
+                          width = tituloAncho,
+                          height = tituloLargo,
+                          fg_color = self.primerGris,
+                          text = " Bloqueados",
+                          font = ("Helvetica", 14),
+                          anchor = "w",
+                          image = imagenEjecucion,
+                          compound = "left")
+        
+        tituloEjecucion.grid(row = 0, column = 0, sticky = "nsew")             
 
     def generarTerminados(self, Frame, Ancho, Largo):
 
@@ -539,4 +612,4 @@ class Ventana:
 
         #Opciones del Backend
 
-        self.Multiprogramacion.asignarTecla(Caracter) 
+        self.Servicio.asignarTecla(Caracter) 
