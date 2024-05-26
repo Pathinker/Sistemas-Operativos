@@ -4,9 +4,9 @@ from CTkTable import *
 import threading
 import time
 
-class Lotes:
+class sistemOperativo:
 
-    def __init__(self, Cantidad, frameNuevos, frameListos, frameEjecucion, frameTerminados, frameTiempo, frameProcesos):
+    def __init__(self, Cantidad, frameNuevos, frameListos, frameEjecucion,frameBloqueados, frameTerminados, frameTiempo, frameProcesos):
 
         self.cantidadProcesos = Cantidad
         self.procesosNuevos = [Proceso.Proceso(i) for i in range(Cantidad)]
@@ -22,11 +22,11 @@ class Lotes:
         self.Estado = True    
 
         self._stop_event = threading.Event()
-        self.iniciar(frameNuevos, frameListos, frameEjecucion, frameTerminados, frameTiempo, frameProcesos)
+        self.iniciar(frameNuevos, frameListos, frameEjecucion,frameBloqueados, frameTerminados, frameTiempo, frameProcesos)
 
-    def iniciar(self, frameNuevos, frameListos, frameEjecucion, frameTerminados, frameTiempo, frameProcesos):  
+    def iniciar(self, frameNuevos, frameListos, frameEjecucion, frameBloqueados, frameTerminados, frameTiempo, frameProcesos):  
 
-        self.Contador = threading.Thread(target=self.ejecutar, daemon = True, args=(frameNuevos, frameListos, frameEjecucion, frameTerminados, frameTiempo, frameProcesos))
+        self.Contador = threading.Thread(target=self.ejecutar, daemon = True, args=(frameNuevos, frameListos, frameEjecucion, frameBloqueados, frameTerminados, frameTiempo, frameProcesos))
         self.Contador.start()
 
     def detener(self):
@@ -34,12 +34,13 @@ class Lotes:
         self._stop_event.set()
         self.Contador.join(timeout=0)      
 
-    def ejecutar(self, frameNuevos, frameListos, frameEjecucion, frameTerminados, frameTiempo, frameProcesos):
+    def ejecutar(self, frameNuevos, frameListos, frameEjecucion, frameBloqueados, frameTerminados, frameTiempo, frameProcesos):
 
         self.recalcular(frameProcesos) # Carga los lotes en Listo y Ejecucion
         self.modificarNuevos(frameNuevos)
         self.modificarListos(frameListos)
         self.modificarEjecucion(frameEjecucion)
+        self.modificarBloqueados(frameBloqueados)
         self.modificarTerminados(frameTerminados)
 
         frameProcesos.configure(text = " Procesos Restantes: {} ".format(self.cantidadProcesos))
@@ -48,10 +49,14 @@ class Lotes:
 
             while(self.Estado):
 
+                if(self.procesosEjecucion[0].obtenerTiempoRespuesta() == None):
+
+                    self.procesosEjecucion[0].asignarTiempoRespuesta(self.Tiempo)                
+
                 time.sleep(1)
 
                 self.Tiempo += 1
-                frameTiempo.configure(text=" Reloj: {} ".format(str(self.Tiempo)))
+                frameTiempo.configure(text=" Reloj: {} ".format(str(self.Tiempo)))                    
 
                 self.procesosEjecucion[0].asignarTiempoEjecutado(self.procesosEjecucion[0].obtenerTiempoEjecutado() + 1)
                 self.tablaEjecucion.insert(1,2,self.procesosEjecucion[0].obtenerTiempoEjecutado())
@@ -108,31 +113,29 @@ class Lotes:
         self.agregarTerminados(self.procesosEjecucion.pop(0))
 
         # Meter otro proceso a ejecucion (siempre que exista)
+        self.tablaListos.delete_row(1)
+
+        #Detener al ya no tener mas procesos pendientes
+
+        if(len(self.procesosListos) <= 0 and len(self.procesosEjecucion) <= 0): # Fin
+
+            self.tablaEjecucion.delete_row(1)
+            return True            
 
         if(len(self.procesosListos) > 0):
 
-            self.tablaListos.delete_row(1)
             self.procesosEjecucion.append(self.procesosListos.pop(0))
-            datosTemporales = self.procesosEjecucion[0].obtenerEjecuccion()
+        
+        datosTemporales = self.procesosEjecucion[0].obtenerEjecuccion()
 
-            for i in range(len(datosTemporales)):
+        for i in range(len(datosTemporales)):
 
                 self.tablaEjecucion.insert(1, i, datosTemporales[i])
 
-        self.recalcular(frameProcesos)
         self.actualizarNuevos()
+        self.recalcular(frameProcesos)
         self.agregarListos()
-    
-        '''
-
-        else:   
-
-            if(len(self.procesosListos) <= 0 and len(self.procesosNuevos) <= 0): # Fin
-
-                self.tablaEjecucion.delete_row(1)
-                return True    
-
-        '''                    
+        
         
     def intercambiar(self):
 
@@ -160,7 +163,7 @@ class Lotes:
         Frame.columnconfigure(0, weight = 1)
 
         Valores = self.procesosNuevos
-        datosTabla = [["ID", "T/ Estimado", "T/ Ejecutado"]]
+        datosTabla = [["ID", "T/ Est", "T/ Eje"]]
 
         for i in  Valores:
 
@@ -240,13 +243,29 @@ class Lotes:
                          corner_radius = 0)
         
         self.tablaEjecucion.grid(row = 0, column = 0, sticky = "nsew", pady = (6,0), padx = (6, 0))    
-       
+
+    def modificarBloqueados(self, Frame):
+
+        Frame.rowconfigure(0, weight = 1)
+        Frame.columnconfigure(0, weight = 1)
+
+        datosTabla = [["ID", "Tiempo Bloqueado"]]
+
+        self.tablaBloqueados = CTkTable(master = Frame,
+                         row = len(datosTabla),
+                         column = len(datosTabla[0]),
+                         header_color = self.fondoAzul,
+                         values = datosTabla,
+                         corner_radius = 0)
+        
+        self.tablaBloqueados.grid(row = 0, column = 0, sticky = "nsew")   
+
     def modificarTerminados(self, Frame):
 
         Frame.rowconfigure(0, weight = 1)
         Frame.columnconfigure(0, weight = 1)
 
-        datosTabla = [["ID", "T/ Est", "T/ Eje", "1°N", "Op", "2°N", "Res"]]
+        datosTabla = [["ID", "T/ Est", "T/ Eje", "1°N", "Op", "2°N", "Res", "T/Lle" , "T/Fin", "T/Ret", "T/Res", "T/Esp", "T/Ser" ]]
 
         self.tablaTerminados = CTkTable(master = Frame,
                          row = len(datosTabla),
@@ -263,7 +282,7 @@ class Lotes:
 
     def agregarListos(self):
 
-        if(len(self.procesosNuevos) > 0):
+        if(len(self.procesosListos) > 0):
 
             self.tablaListos.add_row(self.procesosListos[len(self.procesosListos) - 1].obtenerEjecuccion())
 
