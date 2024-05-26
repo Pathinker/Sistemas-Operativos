@@ -1,4 +1,4 @@
-from Backend import Lote
+from Backend import Proceso
 from customtkinter import *
 from CTkTable import *
 import threading
@@ -6,10 +6,10 @@ import time
 
 class Lotes:
 
-    def __init__(self, Cantidad, frameNuevos, frameListos, frameEjecucion, frameTerminados, frameTiempo, frameLotes):
+    def __init__(self, Cantidad, frameNuevos, frameListos, frameEjecucion, frameTerminados, frameTiempo, frameProcesos):
 
-        self.cantidadLotes = Cantidad // 4 + 1
-        self.procesosNuevos = [Lote.Lote(i, (i + 4) // 4) for i in range(Cantidad)]
+        self.cantidadProcesos = Cantidad
+        self.procesosNuevos = [Proceso.Proceso(i) for i in range(Cantidad)]
         self.procesosListos = []
         self.procesosEjecucion = []
         self.procesosBloqueados = []
@@ -22,11 +22,11 @@ class Lotes:
         self.Estado = True    
 
         self._stop_event = threading.Event()
-        self.iniciar(frameNuevos, frameListos, frameEjecucion, frameTerminados, frameTiempo, frameLotes)
+        self.iniciar(frameNuevos, frameListos, frameEjecucion, frameTerminados, frameTiempo, frameProcesos)
 
-    def iniciar(self, frameNuevos, frameListos, frameEjecucion, frameTerminados, frameTiempo, frameLotes):  
+    def iniciar(self, frameNuevos, frameListos, frameEjecucion, frameTerminados, frameTiempo, frameProcesos):  
 
-        self.Contador = threading.Thread(target=self.ejecutar, daemon = True, args=(frameNuevos, frameListos, frameEjecucion, frameTerminados, frameTiempo, frameLotes))
+        self.Contador = threading.Thread(target=self.ejecutar, daemon = True, args=(frameNuevos, frameListos, frameEjecucion, frameTerminados, frameTiempo, frameProcesos))
         self.Contador.start()
 
     def detener(self):
@@ -34,15 +34,15 @@ class Lotes:
         self._stop_event.set()
         self.Contador.join(timeout=0)      
 
-    def ejecutar(self, frameNuevos, frameListos, frameEjecucion, frameTerminados, frameTiempo, frameLotes):
+    def ejecutar(self, frameNuevos, frameListos, frameEjecucion, frameTerminados, frameTiempo, frameProcesos):
 
-        self.recalcular(frameLotes) # Carga los lotes en Listo y Ejecucion
+        self.recalcular(frameProcesos) # Carga los lotes en Listo y Ejecucion
         self.modificarNuevos(frameNuevos)
         self.modificarListos(frameListos)
         self.modificarEjecucion(frameEjecucion)
         self.modificarTerminados(frameTerminados)
 
-        frameLotes.configure(text = " Lotes Retantes: {} ".format(self.cantidadLotes))
+        frameProcesos.configure(text = " Procesos Restantes: {} ".format(self.cantidadProcesos))
 
         while (not self._stop_event.is_set()):
 
@@ -54,13 +54,13 @@ class Lotes:
                 frameTiempo.configure(text=" Reloj: {} ".format(str(self.Tiempo)))
 
                 self.procesosEjecucion[0].asignarTiempoEjecutado(self.procesosEjecucion[0].obtenerTiempoEjecutado() + 1)
-                self.tablaEjecucion.insert(1,3,self.procesosEjecucion[0].obtenerTiempoEjecutado())
+                self.tablaEjecucion.insert(1,2,self.procesosEjecucion[0].obtenerTiempoEjecutado())
 
                 #Al agotarse el tiempo de ejecucion hacer un swap mandar el ejecutado a terminado y uno de listo a ejecucion.
 
                 if(self.procesosEjecucion[0].obtenerTiempoEjecutado() >= self.procesosEjecucion[0].obtenerTiempoEstimado()):
 
-                    Estado = self.removerEjecutado(frameLotes)
+                    Estado = self.removerEjecutado(frameProcesos)
 
                     if(Estado): # Validar si el programa se acaba, en dado caso retorna verdadero
 
@@ -68,43 +68,46 @@ class Lotes:
                     
                 if(self.Tecla != None):
 
-                    self.obtenerInput(self.Tecla, frameLotes)
+                    self.obtenerInput(self.Tecla, frameProcesos)
 
                     self.Tecla = None                                    
 
             if(self.Tecla != None):
 
-                self.obtenerInput(self.Tecla, frameLotes)
+                self.obtenerInput(self.Tecla, frameProcesos)
 
                 self.Tecla = None                                    
                         
-    def recalcular(self, frameLotes):
+    def recalcular(self, frameProcesos):
 
        procesosDisponibles = len(self.procesosNuevos)
+       memoriaDisponible = 4 - (len(self.procesosEjecucion) + len(self.procesosListos) + len(self.procesosBloqueados))
+         
+       # Cargar todos los nuevos procesos hasta que mi memoria sea llenada.
 
-       self.cantidadLotes -= 1
-
-       frameLotes.configure(text = " Lotes Retantes: {} ".format(self.cantidadLotes))
-
-       if(procesosDisponibles >= 4): #Caso Especial de que tengo menos de 4 procesos.
-
-            for i in range (4):
-
+       for i in range(memoriaDisponible):
+           
+           if(procesosDisponibles > 0):
+               
                 self.procesosListos.append(self.procesosNuevos.pop(0))
+                procesosDisponibles = len(self.procesosNuevos)
+                self.cantidadProcesos -= 1
+
+        # Introduzco un dato de la lista de listos a ejecución.
+
+       if(len(self.procesosListos) > 0):
 
             self.procesosEjecucion.append(self.procesosListos.pop(0))
+              
+       frameProcesos.configure(text = " Proceos Retantes: {} ".format(self.cantidadProcesos))    
 
-       else:
+    def removerEjecutado(self, frameProcesos):
 
-            for i in range(procesosDisponibles):
+        # Sacar el proceso de ejcucion a terminados.
 
-                self.procesosListos.append(self.procesosNuevos.pop(0))
-
-            self.procesosEjecucion.append(self.procesosListos.pop(0)) 
-
-    def removerEjecutado(self, frameLotes):
-    
         self.agregarTerminados(self.procesosEjecucion.pop(0))
+
+        # Meter otro proceso a ejecucion (siempre que exista)
 
         if(len(self.procesosListos) > 0):
 
@@ -116,18 +119,21 @@ class Lotes:
 
                 self.tablaEjecucion.insert(1, i, datosTemporales[i])
 
-        else:
+        self.recalcular(frameProcesos)
+        self.actualizarNuevos()
+        self.agregarListos()
+    
+        '''
+
+        else:   
 
             if(len(self.procesosListos) <= 0 and len(self.procesosNuevos) <= 0): # Fin
 
                 self.tablaEjecucion.delete_row(1)
-                return True                
-                    
-            self.recalcular(frameLotes)
-            self.actualizarNuevos()
-            self.agregarListos()
-            self.actualizarEjecucion()  
+                return True    
 
+        '''                    
+        
     def intercambiar(self):
 
         if(len(self.procesosListos) > 0):
@@ -154,13 +160,12 @@ class Lotes:
         Frame.columnconfigure(0, weight = 1)
 
         Valores = self.procesosNuevos
-        datosTabla = [["Lote", "ID", "T/ Estimado", "T/ Ejecutado"]]
+        datosTabla = [["ID", "T/ Estimado", "T/ Ejecutado"]]
 
         for i in  Valores:
 
             Datos = []
 
-            Datos.append(i.obtenerLote())
             Datos.append(i.obtenerID())
             Datos.append(i.obtenerTiempoEstimado())
             Datos.append(i.obtenerTiempoEjecutado())
@@ -182,13 +187,12 @@ class Lotes:
         Frame.columnconfigure(0, weight = 1)
 
         Valores = self.procesosListos
-        datosTabla = [["Lote", "ID", "T/ Est", "T/ Eje", "1°N", "Op", "2°N"]]
+        datosTabla = [["ID", "T/ Est", "T/ Eje", "1°N", "Op", "2°N"]]
 
         for i in  Valores:
 
             Datos = []
 
-            Datos.append(i.obtenerLote())
             Datos.append(i.obtenerID())
             Datos.append(i.obtenerTiempoEstimado())
             Datos.append(i.obtenerTiempoEjecutado())
@@ -213,13 +217,12 @@ class Lotes:
         Frame.columnconfigure(0, weight = 1)
 
         Valores = self.procesosEjecucion
-        datosTabla = [["Lote", "ID", "T/ Est", "T/ Eje", "1°N", "Op", "2°N"]]
+        datosTabla = [["ID", "T/ Est", "T/ Eje", "1°N", "Op", "2°N"]]
 
         for i in  Valores:
 
             Datos = []
 
-            Datos.append(i.obtenerLote())
             Datos.append(i.obtenerID())
             Datos.append(i.obtenerTiempoEstimado())
             Datos.append(i.obtenerTiempoEjecutado())
@@ -243,7 +246,7 @@ class Lotes:
         Frame.rowconfigure(0, weight = 1)
         Frame.columnconfigure(0, weight = 1)
 
-        datosTabla = [["Lote", "ID", "T/ Est", "T/ Eje", "1°N", "Op", "2°N", "Res"]]
+        datosTabla = [["ID", "T/ Est", "T/ Eje", "1°N", "Op", "2°N", "Res"]]
 
         self.tablaTerminados = CTkTable(master = Frame,
                          row = len(datosTabla),
@@ -260,15 +263,13 @@ class Lotes:
 
     def agregarListos(self):
 
-        for i in range(len(self.procesosListos)):
+        if(len(self.procesosNuevos) > 0):
 
-            self.tablaListos.add_row(self.procesosListos[i].obtenerEjecuccion())
+            self.tablaListos.add_row(self.procesosListos[len(self.procesosListos) - 1].obtenerEjecuccion())
 
     def actualizarNuevos(self):
 
-        cantidadIngresada = len(self.procesosListos) + len(self.procesosEjecucion)
-
-        for i in range(cantidadIngresada):
+        if(len(self.procesosNuevos) > 0):
 
             self.tablaNuevos.delete_row(1)
 
@@ -277,18 +278,14 @@ class Lotes:
         self.tablaEjecucion.delete_row(1)
         self.tablaEjecucion.add_row(self.procesosEjecucion[0].obtenerEjecuccion())   
 
-    def estadoError(self):
-
-        pass
-
-    def obtenerInput(self, Caracter, frameLotes):
+    def obtenerInput(self, Caracter, frameProcesos):
 
         Caracter = Caracter.upper()
 
         if(Caracter == "W" and self.Estado):
             
             self.procesosEjecucion[0].asignarResultado("ERROR")
-            self.removerEjecutado(frameLotes)
+            self.removerEjecutado(frameProcesos)
 
         elif(Caracter == "E"  and self.Estado):
 
