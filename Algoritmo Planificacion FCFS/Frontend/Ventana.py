@@ -484,8 +484,8 @@ class Ventana:
         tituloAncho = self.obtenerEscala(encabezadoAncho, 100)
         tituloLargo = self.obtenerEscala(encabezadoLargo, 100)
 
-        imagenEjecucion = CTkImage(light_image = Image.open("Frontend/Imagenes/Ejecucion.png"),
-                          dark_image = Image.open("Frontend/Imagenes/Ejecucion.png"),
+        imagenEjecucion = CTkImage(light_image = Image.open("Frontend/Imagenes/Bloqueados.png"),
+                          dark_image = Image.open("Frontend/Imagenes/Bloqueados.png"),
                           size = (16, 16))
         
         tituloEjecucion = CTkLabel(master = encabezado,
