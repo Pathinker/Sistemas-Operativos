@@ -1,13 +1,20 @@
 import random
 
-class Lote:
+class Proceso:
 
-    def __init__(self, Numero, Lote):
+    def __init__(self, Numero):
 
-        self.Lote = Lote
         self.ID = Numero
+
         self.tiempoEstimado = random.randint(5, 18)
         self.tiempoEjecutado = 0
+        self.tiempoLlegada = 0
+        self.tiempoFinalizacion = 0
+        self.tiempoRetorno = 0
+        self.tiempoRespuesta = None
+        self.tiempoEspera = 0
+        self.tiempoServicio = 0
+
         self.primerOperando = random.randint(1, 10000)
         self.segundoOperando = random.randint(1, 10000)
         self.Operacion = self.obtenerOperando(random.randint(1, 5))
@@ -56,11 +63,7 @@ class Lote:
         elif(Operador == "%"):
 
             return primerOperando % segundoOperando
-        
-    def obtenerLote(self):
-
-        return self.Lote    
-        
+    
     def obtenerID(self):
 
         return self.ID    
@@ -71,7 +74,31 @@ class Lote:
 
     def obtenerTiempoEjecutado(self):
 
-        return self.tiempoEjecutado    
+        return self.tiempoEjecutado  
+
+    def obtenerTiempoLlegada(self):
+
+        return self.tiempoLlegada
+    
+    def obtenerTiempoFinalizacion(self):
+
+        return self.tiempoFinalizacion   
+
+    def obtenerTiempoRetorno(self):
+
+        return self.tiempoRetorno
+
+    def obtenerTiempoRespuesta(self):
+
+        return self.tiempoRespuesta  
+
+    def obtenerTiempoEspera(self):
+
+        return self.tiempoEspera
+    
+    def obtenerTiempoServicio(self):
+
+        return self.tiempoServicio   
 
     def obtenerPrimerOperando(self):
 
@@ -89,23 +116,46 @@ class Lote:
 
         return self.Resultado
     
-    def asignarID(self, Cantidad):
+    def asignarID(self, Parametro):
 
-        self.ID = Cantidad
+        self.ID = Parametro
 
     def asignarResultado(self, Parametro):
 
         self.Resultado = Parametro        
 
-    def asignarTiempoEjecutado(self, Cantidad):
+    def asignarTiempoEjecutado(self, Parametro):
 
-        self.tiempoEjecutado = Cantidad
+        self.tiempoEjecutado = Parametro
+
+    def asignarTiempoLlegada(self, Parametro):
+
+        self.tiempoLlegada = Parametro
+
+    def asignarTiempoFinalizacion(self, Parametro):
+
+        self.tiempoFinalizacion = Parametro
+
+    def asignarTiempoRetorno(self, Parametro):
+
+        self.tiempoRetorno = Parametro
+
+    def asignarTiempoRespuesta(self, Parametro):
+
+        self.tiempoRespuesta = Parametro
+
+    def asignarTiempoEspera(self, Parametro):
+
+        self.tiempoEspera = Parametro
+
+    def asignarTiempoServicio(self, Parametro):
+
+        self.tiempoServicio = Parametro
 
     def obtenerEjecuccion(self):
 
         Temporal = []
 
-        Temporal.append(self.obtenerLote())
         Temporal.append(self.obtenerID())
         Temporal.append(self.obtenerTiempoEstimado())
         Temporal.append(self.obtenerTiempoEjecutado())
@@ -119,7 +169,6 @@ class Lote:
 
         Temporal = []
 
-        Temporal.append(self.obtenerLote())
         Temporal.append(self.obtenerID())
         Temporal.append(self.obtenerTiempoEstimado())
         Temporal.append(self.obtenerTiempoEjecutado())
@@ -127,5 +176,11 @@ class Lote:
         Temporal.append(self.obtenerOperacion())
         Temporal.append(self.obtenerSegundoOperando())
         Temporal.append(self.obtenerResultado())
+        Temporal.append(self.obtenerTiempoLlegada())
+        Temporal.append(self.obtenerTiempoFinalizacion())
+        Temporal.append(self.obtenerTiempoRetorno())
+        Temporal.append(self.obtenerTiempoRespuesta())
+        Temporal.append(self.obtenerTiempoEspera())
+        Temporal.append(self.obtenerTiempoServicio())
 
         return Temporal
