@@ -20,19 +20,23 @@ class Proceso:
         self.primerOperando = random.randint(1, 10000)
         self.segundoOperando = random.randint(1, 10000)
         self.Operacion = self.obtenerOperando(random.randint(1, 5))
-        self.Resultado = self.realizarOperacion(self.primerOperando, self.segundoOperando, self.Operacion)  
+        self.Resultado = self.realizarOperacion(self.primerOperando, self.segundoOperando, self.Operacion)      
 
     def calcularTiempoRetorno(self):
 
         self.tiempoRetorno = self.tiempoFinalizacion - self.tiempoLlegada
 
-    def calcularTiempoServicio(self):
+    def calcularRespuesta(self, Parametro):
 
-        self.tiempoServicio = self.tiempoEjecutado - self.tiempoServicio
+        self.tiempoRespuesta = Parametro - self.tiempoLlegada 
 
     def calcularTiempoEspera(self):
 
-        self.tiempoEspera = self.tiempoRetorno - self.tiempoEjecutado           
+        self.tiempoEspera = self.tiempoRetorno - self.tiempoEjecutado    
+
+    def calcularTiempoServicio(self):
+
+        self.tiempoServicio = self.tiempoEjecutado - self.tiempoServicio           
 
     def obtenerOperando(self, Numero):
 
