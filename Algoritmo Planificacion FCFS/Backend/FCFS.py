@@ -95,7 +95,8 @@ class sistemOperativo:
                 if(len(self.procesosEjecucion) > 0): #Validar que no tenga todos bloqueados     
 
                     if(self.procesosEjecucion[0].obtenerTiempoEjecutado() >= self.procesosEjecucion[0].obtenerTiempoEstimado()):
-
+                        
+                        self.procesosEjecucion[0].asignarTiempoFinalizacion(self.Tiempo)
                         Estado = self.removerEjecutado(frameProcesos)
 
                         if(Estado): # Validar si el programa se acaba, en dado caso retorna verdadero
@@ -114,7 +115,7 @@ class sistemOperativo:
 
                 self.Tecla = None                                    
                         
-    def recalcular(self, frameProcesos):
+    def recalcular(self, frameProcesos, modificarListos = None ):
 
        procesosDisponibles = len(self.procesosNuevos)
        memoriaDisponible = 4 - (len(self.procesosEjecucion) + len(self.procesosListos) + len(self.procesosBloqueados))
@@ -128,6 +129,10 @@ class sistemOperativo:
                 self.procesosListos.append(self.procesosNuevos.pop(0))
                 procesosDisponibles = len(self.procesosNuevos)
                 self.cantidadProcesos -= 1
+
+                if(modificarListos == 1):
+
+                    self.agregarListos()
 
         # Introduzco un dato de la lista de listos a ejecución.
 
@@ -148,25 +153,21 @@ class sistemOperativo:
 
         #Detener al ya no tener mas procesos pendientes
 
-        if(len(self.procesosListos) <= 0 and len(self.procesosEjecucion) <= 0): # Fin
+        if(len(self.procesosListos) <= 0 and len(self.procesosEjecucion) <= 0 and len(self.procesosBloqueados) <= 0): # Fin
 
             self.tablaEjecucion.delete_row(1)
             return True            
 
         if(len(self.procesosListos) > 0):
-
-            self.procesosEjecucion.append(self.procesosListos.pop(0))
+            
+            self.actualizarNuevos()
+            self.recalcular(frameProcesos, 1)
         
-        datosTemporales = self.procesosEjecucion[0].obtenerEjecuccion()
+            datosTemporales = self.procesosEjecucion[0].obtenerEjecuccion()
 
-        for i in range(len(datosTemporales)):
+            for i in range(len(datosTemporales)):
 
-                self.tablaEjecucion.insert(1, i, datosTemporales[i])
-
-        self.actualizarNuevos()
-        self.recalcular(frameProcesos)
-        self.agregarListos()
-        
+                    self.tablaEjecucion.insert(1, i, datosTemporales[i])
         
     def intercambiar(self):
 
@@ -338,10 +339,17 @@ class sistemOperativo:
 
         for i in range(len(indices)):
 
-            self.procesosListos.append(self.procesosBloqueados.pop(0))
-            self.tablaBloqueados.delete_row(1)
+            if(len(self.procesosEjecucion) <= 0):
 
-            self.tablaListos.add_row(self.procesosListos[len(self.procesosListos)-1].obtenerEjecuccion())    
+                self.procesosEjecucion.append(self.procesosBloqueados.pop(0))
+                self.tablaEjecucion.add_row(self.procesosEjecucion[0].obtenerEjecuccion())     
+
+            else:    
+
+                self.procesosListos.append(self.procesosBloqueados.pop(0))
+                self.tablaListos.add_row(self.procesosListos[len(self.procesosListos)-1].obtenerEjecuccion()) 
+
+            self.tablaBloqueados.delete_row(1)       
 
     def obtenerInput(self, Caracter, frameProcesos):
 
@@ -367,4 +375,3 @@ class sistemOperativo:
     def asignarTecla(self, Tecla):
 
         self.Tecla = Tecla
-        print(self.Tecla)    
