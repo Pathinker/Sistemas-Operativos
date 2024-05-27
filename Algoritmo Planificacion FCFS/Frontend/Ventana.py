@@ -1,7 +1,6 @@
 from customtkinter import *
 from CTkTable import *
 from PIL import Image
-import time
 
 from Backend import FCFS
 
