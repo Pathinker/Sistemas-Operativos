@@ -7,7 +7,7 @@ class Proceso:
         self.ID = Numero
 
         self.tiempoEstimado = random.randint(5, 18)
-        self.tiempoEjecutado = 0
+        self.tiempoEjecutado = 0 #
         self.tiempoLlegada = 0
         self.tiempoFinalizacion = 0
         self.tiempoRetorno = 0
