@@ -52,8 +52,8 @@ class sistemOperativo:
                 if(len(self.procesosEjecucion) > 0): #Validar que no tenga todos bloqueados
 
                     if(self.procesosEjecucion[0].obtenerTiempoRespuesta() == None): #Tiempo Respuesta
-
-                        self.procesosEjecucion[0].asignarTiempoRespuesta(self.Tiempo)                
+                        
+                        self.procesosEjecucion[0].calcularRespuesta(self.Tiempo)                
 
                 time.sleep(1)
 
