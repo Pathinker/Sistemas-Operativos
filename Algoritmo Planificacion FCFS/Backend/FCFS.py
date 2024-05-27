@@ -51,7 +51,7 @@ class sistemOperativo:
 
                 if(len(self.procesosEjecucion) > 0): #Validar que no tenga todos bloqueados
 
-                    if(self.procesosEjecucion[0].obtenerTiempoRespuesta() == None):
+                    if(self.procesosEjecucion[0].obtenerTiempoRespuesta() == None): #Tiempo Respuesta
 
                         self.procesosEjecucion[0].asignarTiempoRespuesta(self.Tiempo)                
 
@@ -96,7 +96,6 @@ class sistemOperativo:
 
                     if(self.procesosEjecucion[0].obtenerTiempoEjecutado() >= self.procesosEjecucion[0].obtenerTiempoEstimado()):
                         
-                        self.procesosEjecucion[0].asignarTiempoFinalizacion(self.Tiempo)
                         Estado = self.removerEjecutado(frameProcesos)
 
                         if(Estado): # Validar si el programa se acaba, en dado caso retorna verdadero
@@ -125,7 +124,8 @@ class sistemOperativo:
        for i in range(memoriaDisponible):
            
            if(procesosDisponibles > 0):
-               
+
+                self.procesosNuevos[0].asignarTiempoLlegada(self.Tiempo) # Tiempo Llegada
                 self.procesosListos.append(self.procesosNuevos.pop(0))
                 procesosDisponibles = len(self.procesosNuevos)
                 self.cantidadProcesos -= 1
@@ -146,6 +146,10 @@ class sistemOperativo:
 
         # Sacar el proceso de ejcucion a terminados.
 
+        self.procesosEjecucion[0].asignarTiempoFinalizacion(self.Tiempo) # Tiempo Finalizacion
+        self.procesosEjecucion[0].calcularTiempoRetorno() # Tiempo Retorno
+        self.procesosEjecucion[0].calcularTiempoServicio() # Tiempo Servicio
+        self.procesosEjecucion[0].calcularTiempoEspera() # Tiempo Espera
         self.agregarTerminados(self.procesosEjecucion.pop(0))
 
         # Meter otro proceso a ejecucion (siempre que exista)
