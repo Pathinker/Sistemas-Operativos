@@ -131,8 +131,12 @@ class sistemOperativo:
                 self.cantidadProcesos -= 1
 
                 if(modificarListos == 1):
-
+                    
                     self.agregarListos()
+
+                    if(len(self.procesosBloqueados) > 2):# Significa que puede ingresar otro a memoria porque tengo todos bloqueados
+                            
+                            self.tablaListos.delete_row(1)
 
         # Introduzco un dato de la lista de listos a ejecución.
 
@@ -154,7 +158,7 @@ class sistemOperativo:
 
         # Meter otro proceso a ejecucion (siempre que exista)
         self.tablaListos.delete_row(1)
-
+    
         #Detener al ya no tener mas procesos pendientes
 
         if(len(self.procesosListos) <= 0 and len(self.procesosEjecucion) <= 0 and len(self.procesosBloqueados) <= 0): # Fin
@@ -162,16 +166,16 @@ class sistemOperativo:
             self.tablaEjecucion.delete_row(1)
             return True            
 
-        if(len(self.procesosListos) > 0):
-            
+        if(len(self.procesosListos) > 0 or len(self.procesosBloqueados) > 0):
+
+            self.tablaEjecucion.delete_row(1)
             self.actualizarNuevos()
             self.recalcular(frameProcesos, 1)
+
+            if(len(self.procesosEjecucion) > 0): #En caso de tener todos bloqueados y ninguno proceso mas pendiente de entrar
         
-            datosTemporales = self.procesosEjecucion[0].obtenerEjecuccion()
-
-            for i in range(len(datosTemporales)):
-
-                    self.tablaEjecucion.insert(1, i, datosTemporales[i])
+                datosTemporales = self.procesosEjecucion[0].obtenerEjecuccion()
+                self.tablaEjecucion.add_row(datosTemporales)
         
     def intercambiar(self):
 
