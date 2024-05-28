@@ -6,7 +6,7 @@ from Backend import Proceso
 
 class BCP:
 
-    def __init__(self, Ventana, procesosTerminados, Estado):
+    def __init__(self, Ventana, procesosNuevos, procesosListos, procesosEjecucion, procesosBloqueados, procesosTerminados, Estado, Tiempo):
 
         self.app = CTkToplevel(Ventana)
         self.ventanaAncho = self.obtenerAncho(self.app, 70)
@@ -26,7 +26,12 @@ class BCP:
         
         self.fondoAzul = "#1565C0"    
 
-        self.procesosTerminados = procesosTerminados    
+        self.procesosNuevos = procesosNuevos.copy()
+        self.procesosListos = procesosListos.copy()
+        self.procesosEjecucion = procesosEjecucion.copy()
+        self.procesosBloqueados = procesosBloqueados.copy()
+        self.procesosTerminados = procesosTerminados.copy()
+        self.Tiempo = Tiempo    
 
         self.generarFrames(self.app, Estado)
 
@@ -133,11 +138,56 @@ class BCP:
         Frame.rowconfigure(0, weight = 1)
         Frame.columnconfigure(0, weight = 1)
 
-        datosTabla = [["ID", "T/ Est", "T/ Eje", "1°N", "Op", "2°N", "Res", "T/Lle" , "T/Fin", "T/Ret", "T/Res", "T/Esp", "T/Ser" ]]
+        datosTabla = [["ID", "T/ Est", "T/ Eje", "1°N", "Op", "2°N", "Res", "T/Lle" , "T/Fin", "T/Ret", "T/Res", "T/Esp", "T/Ser", "T/Blo Res", "T/Eje Res"]]
 
         for i in range(len(self.procesosTerminados)):
 
-            Temporal = self.procesosTerminados[i].obtenerTodo()
+            Temporal = self.procesosTerminados[i].obtenerBCP()
+            datosTabla.append(Temporal)
+
+        for i in range(len(self.procesosEjecucion)):
+
+            self.procesosEjecucion[i].asignarResultado(None)
+            self.procesosEjecucion[i].asignarTiempoFinalizacion(None)
+            self.procesosEjecucion[i].asignarTiempoRetorno(None)
+            self.procesosEjecucion[i].asignarTiempoEspera(self.Tiempo - self.procesosEjecucion[i].obtenerTiempoInicio())  
+
+            Temporal = self.procesosEjecucion[i].obtenerBCP()  
+
+            datosTabla.append(Temporal)
+
+        for i in range(len(self.procesosBloqueados)):
+
+            self.procesosBloqueados[i].asignarResultado(None)
+            self.procesosBloqueados[i].asignarTiempoFinalizacion(None)
+            self.procesosBloqueados[i].asignarTiempoRetorno(None)
+            self.procesosBloqueados[i].asignarTiempoEspera(self.Tiempo - self.procesosBloqueados[i].obtenerTiempoInicio())  
+
+            Temporal = self.procesosBloqueados[i].obtenerBCP()  
+
+            datosTabla.append(Temporal)              
+    
+        for i in range(len(self.procesosListos)):
+
+            self.procesosListos[i].asignarResultado(None)
+            self.procesosListos[i].asignarTiempoFinalizacion(None)
+            self.procesosListos[i].asignarTiempoRetorno(None)
+            self.procesosListos[i].asignarTiempoEspera(self.Tiempo - self.procesosListos[i].obtenerTiempoInicio())  
+
+            Temporal = self.procesosListos[i].obtenerBCP()  
+
+            datosTabla.append(Temporal)
+    
+        for i in range(len(self.procesosNuevos)):
+
+            self.procesosNuevos[i].asignarResultado(None)
+            self.procesosNuevos[i].asignarTiempoLlegada(None)
+            self.procesosNuevos[i].asignarTiempoFinalizacion(None)
+            self.procesosNuevos[i].asignarTiempoRetorno(None)
+            self.procesosNuevos[i].asignarTiempoEspera(self.Tiempo -  self.procesosNuevos[i].obtenerTiempoInicio())            
+
+            Temporal = self.procesosNuevos[i].obtenerBCP()
+
             datosTabla.append(Temporal)
 
         self.tablaTerminados = CTkTable(master = Frame,
