@@ -4,9 +4,11 @@ from CTkTable import *
 import threading
 import time
 
+from Frontend import BCP
+
 class sistemOperativo:
 
-    def __init__(self, Cantidad, frameNuevos, frameListos, frameEjecucion,frameBloqueados, frameTerminados, frameTiempo, frameProcesos):
+    def __init__(self, Ventana, Cantidad, frameNuevos, frameListos, frameEjecucion,frameBloqueados, frameTerminados, frameTiempo, frameProcesos):
 
         self.idProceso = Cantidad - 1
         self.cantidadProcesos = Cantidad
@@ -29,11 +31,11 @@ class sistemOperativo:
         self.Estado = True    
 
         self._stop_event = threading.Event()
-        self.iniciar(frameNuevos, frameListos, frameEjecucion,frameBloqueados, frameTerminados, frameTiempo, frameProcesos)
+        self.iniciar(Ventana, frameNuevos, frameListos, frameEjecucion,frameBloqueados, frameTerminados, frameTiempo, frameProcesos)
 
-    def iniciar(self, frameNuevos, frameListos, frameEjecucion, frameBloqueados, frameTerminados, frameTiempo, frameProcesos):  
+    def iniciar(self, Ventana, frameNuevos, frameListos, frameEjecucion, frameBloqueados, frameTerminados, frameTiempo, frameProcesos):  
 
-        self.Contador = threading.Thread(target=self.ejecutar, daemon = True, args=(frameNuevos, frameListos, frameEjecucion, frameBloqueados, frameTerminados, frameTiempo, frameProcesos))
+        self.Contador = threading.Thread(target=self.ejecutar, daemon = True, args=(Ventana, frameNuevos, frameListos, frameEjecucion, frameBloqueados, frameTerminados, frameTiempo, frameProcesos))
         self.Contador.start()
 
     def detener(self):
@@ -41,7 +43,7 @@ class sistemOperativo:
         self._stop_event.set()
         self.Contador.join(timeout=0)      
 
-    def ejecutar(self, frameNuevos, frameListos, frameEjecucion, frameBloqueados, frameTerminados, frameTiempo, frameProcesos):
+    def ejecutar(self, Ventana, frameNuevos, frameListos, frameEjecucion, frameBloqueados, frameTerminados, frameTiempo, frameProcesos):
 
         self.recalcular(frameProcesos) # Carga los lotes en Listo y Ejecucion
         self.modificarNuevos(frameNuevos)
@@ -111,13 +113,13 @@ class sistemOperativo:
                         
                 if(self.Tecla != None):
 
-                    self.obtenerInput(self.Tecla, frameProcesos)
+                    self.obtenerInput(Ventana, self.Tecla, frameProcesos)
 
                     self.Tecla = None                                    
 
             if(self.Tecla != None):
 
-                self.obtenerInput(self.Tecla, frameProcesos)
+                self.obtenerInput(Ventana, self.Tecla, frameProcesos)
 
                 self.Tecla = None                                    
                         
@@ -311,7 +313,7 @@ class sistemOperativo:
         Frame.rowconfigure(0, weight = 1)
         Frame.columnconfigure(0, weight = 1)
 
-        datosTabla = [["ID", "T/ Est", "T/ Eje", "1°N", "Op", "2°N", "Res", "T/Lle" , "T/Fin", "T/Ret", "T/Res", "T/Esp", "T/Ser" ]]
+        datosTabla = [["ID", "T/ Est", "T/ Eje", "1°N", "Op", "2°N", "Res"]]
 
         self.tablaTerminados = CTkTable(master = Frame,
                          row = len(datosTabla),
@@ -340,7 +342,7 @@ class sistemOperativo:
         
     def agregarTerminados(self, Informacion):
 
-        self.tablaTerminados.add_row(Informacion.obtenerTodo())
+        self.tablaTerminados.add_row(Informacion.obtenerTerminados())
 
     def actualizarNuevos(self):
 
@@ -399,7 +401,7 @@ class sistemOperativo:
             self.procesosEjecucion.append(nuevoProceso)
             self.agregarEjecucion()
 
-    def obtenerInput(self, Caracter, frameProcesos):
+    def obtenerInput(self, Ventana, Caracter, frameProcesos):
 
         Caracter = Caracter.upper()
         procesoActivo = len(self.procesosEjecucion)
@@ -425,9 +427,10 @@ class sistemOperativo:
 
             self.agregarNuevoProceso(frameProcesos)  
 
-        elif(Caracter == "B" and self.Estado):
+        elif(Caracter == "B"):
 
-            pass      
+            self.Estado = False
+            BCP.BCP(Ventana, self.procesosTerminados)
 
     def asignarTecla(self, Tecla):
 
