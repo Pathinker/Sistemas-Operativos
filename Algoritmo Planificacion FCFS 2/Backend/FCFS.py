@@ -382,7 +382,7 @@ class sistemOperativo:
     def agregarNuevoProceso(self, frameProcesos):
 
         self.idProceso += 1
-        nuevoProceso = Proceso.Proceso(self.idProceso)
+        nuevoProceso = Proceso.Proceso(self.idProceso, self.Tiempo)
 
         if(len(self.procesosBloqueados) + len(self.procesosListos) + len(self.procesosEjecucion) >= 4): # Memoria Llena
 
