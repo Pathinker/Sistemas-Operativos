@@ -8,8 +8,15 @@ class sistemOperativo:
 
     def __init__(self, Cantidad, frameNuevos, frameListos, frameEjecucion,frameBloqueados, frameTerminados, frameTiempo, frameProcesos):
 
+        self.idProceso = Cantidad - 1
         self.cantidadProcesos = Cantidad
-        self.procesosNuevos = [Proceso.Proceso(i) for i in range(Cantidad)]
+        self.procesosNuevos = []
+
+        for i in range(Cantidad): #Es incorporado para establecer un ID ascendente a los próximos procesos creados.
+
+            Solicitud = Proceso.Proceso(i)
+            self.procesosNuevos.append(Solicitud)
+
         self.procesosListos = []
         self.procesosEjecucion = []
         self.procesosBloqueados = []
@@ -102,11 +109,11 @@ class sistemOperativo:
 
                             return
                         
-                    if(self.Tecla != None):
+                if(self.Tecla != None):
 
-                        self.obtenerInput(self.Tecla, frameProcesos)
+                    self.obtenerInput(self.Tecla, frameProcesos)
 
-                        self.Tecla = None                                    
+                    self.Tecla = None                                    
 
             if(self.Tecla != None):
 
@@ -161,10 +168,9 @@ class sistemOperativo:
     
         #Detener al ya no tener mas procesos pendientes
 
-        if(len(self.procesosListos) <= 0 and len(self.procesosEjecucion) <= 0 and len(self.procesosBloqueados) <= 0): # Fin
+        if(len(self.procesosListos) <= 0 and len(self.procesosEjecucion) <= 0 and len(self.procesosBloqueados) <= 0): # Permitir que se siga ejecutando por la posibilidad de agregar nuevos
 
-            self.tablaEjecucion.delete_row(1)
-            return True            
+            self.tablaEjecucion.delete_row(1)         
 
         if(len(self.procesosListos) > 0 or len(self.procesosBloqueados) > 0):
 
@@ -316,15 +322,25 @@ class sistemOperativo:
         
         self.tablaTerminados.grid(row = 0, column = 0, sticky = "nsew")   
 
-    def agregarTerminados(self, Informacion):
+    def agregarNuevos(self):
 
-        self.tablaTerminados.add_row(Informacion.obtenerTodo())
+        if(len(self.procesosNuevos) > 0):
+
+            self.tablaNuevos.add_row(self.procesosNuevos[len(self.procesosNuevos) - 1].obtenerNuevo())
 
     def agregarListos(self):
 
         if(len(self.procesosListos) > 0):
 
             self.tablaListos.add_row(self.procesosListos[len(self.procesosListos) - 1].obtenerEjecuccion())
+
+    def agregarEjecucion(self):
+
+        self.tablaEjecucion.add_row(self.procesosEjecucion[len(self.procesosEjecucion) - 1].obtenerEjecuccion())
+        
+    def agregarTerminados(self, Informacion):
+
+        self.tablaTerminados.add_row(Informacion.obtenerTodo())
 
     def actualizarNuevos(self):
 
@@ -357,18 +373,43 @@ class sistemOperativo:
                 self.procesosListos.append(self.procesosBloqueados.pop(0))
                 self.tablaListos.add_row(self.procesosListos[len(self.procesosListos)-1].obtenerEjecuccion()) 
 
-            self.tablaBloqueados.delete_row(1)       
+            self.tablaBloqueados.delete_row(1)      
+
+    def agregarNuevoProceso(self, frameProcesos):
+
+        self.idProceso += 1
+        nuevoProceso = Proceso.Proceso(self.idProceso)
+
+        if(len(self.procesosBloqueados) + len(self.procesosListos) + len(self.procesosEjecucion) >= 4): # Memoria Llena
+
+            self.procesosNuevos.append(nuevoProceso)
+            self.cantidadProcesos += 1
+            frameProcesos.configure(text = " Procesos Restantes: {} ".format(self.cantidadProcesos))
+            self.agregarNuevos()
+
+        elif(len(self.procesosEjecucion) > 0):   # Si tengo uno ejecutandose entonces agregarlo en listos 
+
+            nuevoProceso.asignarTiempoLlegada(self.Tiempo)
+            self.procesosListos.append(nuevoProceso)
+            self.agregarListos()
+
+        else: # Entonces significa que no tengo la memoria llena y tampoco en ejecución, por lo tanto lo incorporo en ejecución:
+
+            nuevoProceso.asignarTiempoLlegada(self.Tiempo)
+            self.procesosEjecucion.append(nuevoProceso)
+            self.agregarEjecucion()
 
     def obtenerInput(self, Caracter, frameProcesos):
 
         Caracter = Caracter.upper()
+        procesoActivo = len(self.procesosEjecucion)
 
-        if(Caracter == "W" and self.Estado):
+        if(Caracter == "W" and self.Estado and procesoActivo > 0):
             
             self.procesosEjecucion[0].asignarResultado("ERROR")
             self.removerEjecutado(frameProcesos)
 
-        elif(Caracter == "E"  and self.Estado):
+        elif(Caracter == "E"  and self.Estado and procesoActivo > 0):
 
             self.intercambiar()
 
@@ -379,6 +420,14 @@ class sistemOperativo:
         elif(Caracter == "C"):   
 
             self.Estado = True
+
+        elif(Caracter == "N" and self.Estado):
+
+            self.agregarNuevoProceso(frameProcesos)  
+
+        elif(Caracter == "B" and self.Estado):
+
+            pass      
 
     def asignarTecla(self, Tecla):
 
