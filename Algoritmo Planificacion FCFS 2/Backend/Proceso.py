@@ -208,7 +208,21 @@ class Proceso:
         Temporal.append(self.obtenerID())
         Temporal.append(self.obtenerTiempoBloqueado())
 
-        return Temporal  
+        return Temporal 
+
+    def obtenerTerminados(self):
+
+        Temporal = []
+
+        Temporal.append(self.obtenerID())
+        Temporal.append(self.obtenerTiempoEstimado())
+        Temporal.append(self.obtenerTiempoEjecutado())
+        Temporal.append(self.obtenerPrimerOperando()) 
+        Temporal.append(self.obtenerOperacion())
+        Temporal.append(self.obtenerSegundoOperando())
+        Temporal.append(self.obtenerResultado())
+
+        return Temporal        
 
     def obtenerTodo(self):
 
