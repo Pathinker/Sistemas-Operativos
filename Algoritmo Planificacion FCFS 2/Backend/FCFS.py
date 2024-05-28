@@ -28,7 +28,7 @@ class sistemOperativo:
         self.fondoAzul = "#1565C0"
 
         self.Tecla = ""
-        self.Estado = True    
+        self.Estado = [True]    
 
         self._stop_event = threading.Event()
         self.iniciar(Ventana, frameNuevos, frameListos, frameEjecucion,frameBloqueados, frameTerminados, frameTiempo, frameProcesos)
@@ -56,7 +56,7 @@ class sistemOperativo:
 
         while (not self._stop_event.is_set()):
 
-            while(self.Estado):
+            while(self.Estado[0]):
 
                 if(len(self.procesosEjecucion) > 0): #Validar que no tenga todos bloqueados
 
@@ -157,7 +157,7 @@ class sistemOperativo:
 
     def removerEjecutado(self, frameProcesos):
 
-        # Sacar el proceso de ejcucion a terminados.
+        # Sacar el proceso de ejecucion a terminados.
 
         self.procesosEjecucion[0].asignarTiempoFinalizacion(self.Tiempo) # Tiempo Finalizacion
         self.procesosEjecucion[0].calcularTiempoRetorno() # Tiempo Retorno
@@ -342,6 +342,8 @@ class sistemOperativo:
         
     def agregarTerminados(self, Informacion):
 
+        self.procesosTerminados.append(Informacion)
+
         self.tablaTerminados.add_row(Informacion.obtenerTerminados())
 
     def actualizarNuevos(self):
@@ -406,31 +408,31 @@ class sistemOperativo:
         Caracter = Caracter.upper()
         procesoActivo = len(self.procesosEjecucion)
 
-        if(Caracter == "W" and self.Estado and procesoActivo > 0):
+        if(Caracter == "W" and self.Estado[0] and procesoActivo > 0):
             
             self.procesosEjecucion[0].asignarResultado("ERROR")
             self.removerEjecutado(frameProcesos)
 
-        elif(Caracter == "E"  and self.Estado and procesoActivo > 0):
+        elif(Caracter == "E"  and self.Estado[0] and procesoActivo > 0):
 
             self.intercambiar()
 
         elif(Caracter == "P"):
 
-            self.Estado = False
+            self.Estado[0] = False
 
         elif(Caracter == "C"):   
 
-            self.Estado = True
+            self.Estado[0] = True
 
-        elif(Caracter == "N" and self.Estado):
+        elif(Caracter == "N" and self.Estado[0]):
 
             self.agregarNuevoProceso(frameProcesos)  
 
         elif(Caracter == "B"):
 
-            self.Estado = False
-            BCP.BCP(Ventana, self.procesosTerminados)
+            self.Estado[0] = False
+            BCP.BCP(Ventana, self.procesosTerminados, self.Estado)
 
     def asignarTecla(self, Tecla):
 
