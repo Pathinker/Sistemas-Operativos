@@ -167,7 +167,7 @@ class BCP:
 
             datosTabla.append(Temporal)              
     
-        for i in range(len(self.procesosListos)):
+        for i in range(len(self.procesosListos)):   
 
             self.procesosListos[i].asignarResultado(None)
             self.procesosListos[i].asignarTiempoFinalizacion(None)
