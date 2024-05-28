@@ -176,7 +176,17 @@ class Proceso:
 
     def asignarTiempoBloqueado(self, Parametro):
 
-        self.tiempoBloqueado = Parametro    
+        self.tiempoBloqueado = Parametro
+
+    def obtenerNuevo(self):
+
+        Temporal = []
+
+        Temporal.append(self.obtenerID())
+        Temporal.append(self.obtenerTiempoEstimado())
+        Temporal.append(self.obtenerTiempoEjecutado()) 
+
+        return Temporal
 
     def obtenerEjecuccion(self):
 
