@@ -17,7 +17,6 @@ class Ventana:
         self.app.geometry(f"{self.ventanaAncho}x{self.ventanaLargo}")
         #self.app.attributes("-fullscreen", True)
 
-
         #Paleta Colores
 
         self.colorFondo = '#373739'
@@ -165,14 +164,15 @@ class Ventana:
 
         self.generarFrames(self.app)
 
-        self.Servicio = FCFS.sistemOperativo(valor, 
-                                                         self.nuevosContenedor,
-                                                         self.listosContenedor,
-                                                         self.ejecucionContenedor,
-                                                         self.bloqueadosContenedor,
-                                                         self.terminadosContenedor,
-                                                         self.tituloReloj,
-                                                         self.tituloPendientes)
+        self.Servicio = FCFS.sistemOperativo(self.app,
+                                             valor, 
+                                             self.nuevosContenedor,
+                                             self.listosContenedor,
+                                             self.ejecucionContenedor,
+                                             self.bloqueadosContenedor,
+                                             self.terminadosContenedor,
+                                             self.tituloReloj,
+                                             self.tituloPendientes)
                                                 
     def generarFrames(self, Ventana):
 
@@ -207,13 +207,13 @@ class Ventana:
         Frame.columnconfigure(1, weight = 1)
         Frame.columnconfigure(2, weight = 1)
 
-        nuevosAncho = self.obtenerEscala(Ancho, 10)
+        nuevosAncho = self.obtenerEscala(Ancho, 33)
         nuevosLargo = self.obtenerEscala(Largo, 100)
 
-        pendientesAncho = self.obtenerEscala(Ancho, 30)
+        pendientesAncho = self.obtenerEscala(Ancho, 33)
         pendientesLargo = self.obtenerEscala(Largo, 100)
 
-        contenedoresAncho = self.obtenerEscala(Ancho, 60)
+        contenedoresAncho = self.obtenerEscala(Ancho, 33)
         contenedoresLargo = self.obtenerEscala(Largo, 100)
 
         Nuevos = CTkFrame(master = Frame,
@@ -602,7 +602,6 @@ class Ventana:
         Contenido.insert("6.0", "C: Continuar\n\n")
         Contenido.insert("7.0", "N: Nuevo\n\n")
         Contenido.insert("8.0", "B: Tabla Control Procesos\n\n")
-        #Contenido.insert("8.0", "Las teclas seran detectadas al presionar [Enter]\n\n")
 
         Contenido.bind("<KeyPress>", lambda event: self.Enter(event.char))
 
