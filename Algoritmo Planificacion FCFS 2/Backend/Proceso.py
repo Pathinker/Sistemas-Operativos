@@ -14,6 +14,7 @@ class Proceso:
         self.tiempoRespuesta = None
         self.tiempoEspera = 0
         self.tiempoServicio = 0
+        self.Resultado = None
 
         self.tiempoInicio = tiempoInicio
 
@@ -22,7 +23,7 @@ class Proceso:
         self.primerOperando = random.randint(1, 10000)
         self.segundoOperando = random.randint(1, 10000)
         self.Operacion = self.obtenerOperando(random.randint(1, 5))
-        self.Resultado = self.realizarOperacion(self.primerOperando, self.segundoOperando, self.Operacion)      
+        self.realizarOperacion()      
 
     def calcularTiempoRetorno(self):
 
@@ -62,27 +63,27 @@ class Proceso:
 
             return "%"
         
-    def realizarOperacion(self, primerOperando, segundoOperando, Operador):
+    def realizarOperacion(self):
 
-        if(Operador == "+"):
+        if(self.Operacion == "+"):
 
-            return primerOperando + segundoOperando
+            self.Resultado = self.primerOperando + self.segundoOperando
 
-        elif(Operador == "-"):
+        elif(self.Operacion == "-"):
 
-            return primerOperando - segundoOperando    
+            self.Resultado = self.primerOperando - self.segundoOperando    
         
-        elif(Operador == "*"):
+        elif(self.Operacion == "*"):
 
-            return primerOperando * segundoOperando
+            self.Resultado = self.primerOperando * self.segundoOperando
         
-        elif(Operador == "/"):
+        elif(self.Operacion == "/"):
 
-            return primerOperando // segundoOperando
+            self.Resultado = self.primerOperando // self.segundoOperando
         
-        elif(Operador == "%"):
+        elif(self.Operacion == "%"):
 
-            return primerOperando % segundoOperando
+            self.Resultado = self.primerOperando % self.segundoOperando
     
     def obtenerID(self):
 
