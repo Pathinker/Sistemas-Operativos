@@ -155,7 +155,7 @@ class sistemOperativo:
               
        frameProcesos.configure(text = " Proceos Retantes: {} ".format(self.cantidadProcesos))    
 
-    def removerEjecutado(self, frameProcesos):
+    def removerEjecutado(self, frameProcesos, Error = None):
 
         # Sacar el proceso de ejecucion a terminados.
 
@@ -163,6 +163,11 @@ class sistemOperativo:
         self.procesosEjecucion[0].calcularTiempoRetorno() # Tiempo Retorno
         self.procesosEjecucion[0].calcularTiempoServicio() # Tiempo Servicio
         self.procesosEjecucion[0].calcularTiempoEspera() # Tiempo Espera
+
+        if(Error == None):
+
+            self.procesosEjecucion[0].realizarOperacion() #Obtener el resultado si no salio con error.
+            
         self.agregarTerminados(self.procesosEjecucion.pop(0))
 
         # Meter otro proceso a ejecucion (siempre que exista)
@@ -411,7 +416,7 @@ class sistemOperativo:
         if(Caracter == "W" and self.Estado[0] and procesoActivo > 0):
             
             self.procesosEjecucion[0].asignarResultado("ERROR")
-            self.removerEjecutado(frameProcesos)
+            self.removerEjecutado(frameProcesos, 1)
 
         elif(Caracter == "E"  and self.Estado[0] and procesoActivo > 0):
 
