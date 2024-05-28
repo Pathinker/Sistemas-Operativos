@@ -2,7 +2,7 @@ import random
 
 class Proceso:
 
-    def __init__(self, Numero):
+    def __init__(self, Numero, tiempoInicio):
 
         self.ID = Numero
 
@@ -14,6 +14,8 @@ class Proceso:
         self.tiempoRespuesta = None
         self.tiempoEspera = 0
         self.tiempoServicio = 0
+
+        self.tiempoInicio = tiempoInicio
 
         self.tiempoBloqueado = 0
 
@@ -138,6 +140,10 @@ class Proceso:
 
         return self.tiempoBloqueado
     
+    def obtenerTiempoInicio(self):
+
+        return self.tiempoInicio
+    
     def asignarID(self, Parametro):
 
         self.ID = Parametro
@@ -243,3 +249,41 @@ class Proceso:
         Temporal.append(self.obtenerTiempoServicio())
 
         return Temporal
+    
+    def obtenerBCP(self):
+
+        Temporal = []
+
+        Temporal.append(self.obtenerID())
+        Temporal.append(self.obtenerTiempoEstimado())
+        Temporal.append(self.obtenerTiempoEjecutado())
+        Temporal.append(self.obtenerPrimerOperando()) 
+        Temporal.append(self.obtenerOperacion())
+        Temporal.append(self.obtenerSegundoOperando())
+        Temporal.append(self.obtenerResultado())
+        Temporal.append(self.obtenerTiempoLlegada())
+        Temporal.append(self.obtenerTiempoFinalizacion())
+        Temporal.append(self.obtenerTiempoRetorno())
+        Temporal.append(self.obtenerTiempoRespuesta())
+        Temporal.append(self.obtenerTiempoEspera())
+        Temporal.append(self.obtenerTiempoServicio())
+
+        if(self.obtenerTiempoBloqueado() == 0): # Calcular el tiempo de bloqueo restante en caso de tenerlo
+
+            Temporal.append(None)
+
+        else:
+
+            Temporal.append(8 - self.obtenerTiempoBloqueado())
+
+        tiempoRestante = self.obtenerTiempoEstimado() - self.obtenerTiempoEjecutado()
+
+        if(tiempoRestante > 0):
+
+           Temporal.append(tiempoRestante)
+
+        else:
+        
+            Temporal.append(None)
+
+        return Temporal 
