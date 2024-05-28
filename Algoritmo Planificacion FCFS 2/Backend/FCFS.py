@@ -14,16 +14,16 @@ class sistemOperativo:
         self.cantidadProcesos = Cantidad
         self.procesosNuevos = []
 
-        for i in range(Cantidad): #Es incorporado para establecer un ID ascendente a los próximos procesos creados.
-
-            Solicitud = Proceso.Proceso(i)
-            self.procesosNuevos.append(Solicitud)
-
         self.procesosListos = []
         self.procesosEjecucion = []
         self.procesosBloqueados = []
         self.procesosTerminados = []
         self.Tiempo = 0
+
+        for i in range(Cantidad): #Es incorporado para establecer un ID ascendente a los próximos procesos creados.
+
+            Solicitud = Proceso.Proceso(i, self.Tiempo)
+            self.procesosNuevos.append(Solicitud)
 
         self.fondoAzul = "#1565C0"
 
@@ -432,7 +432,7 @@ class sistemOperativo:
         elif(Caracter == "B"):
 
             self.Estado[0] = False
-            BCP.BCP(Ventana, self.procesosTerminados, self.Estado)
+            BCP.BCP(Ventana, self.procesosNuevos, self.procesosListos, self.procesosEjecucion, self.procesosBloqueados, self.procesosTerminados, self.Estado, self.Tiempo)
 
     def asignarTecla(self, Tecla):
 
