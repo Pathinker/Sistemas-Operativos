@@ -600,6 +600,8 @@ class Ventana:
         Contenido.insert("4.0", "W: Error\n")
         Contenido.insert("5.0", "P: Pausa\n")
         Contenido.insert("6.0", "C: Continuar\n\n")
+        Contenido.insert("7.0", "N: Nuevo\n\n")
+        Contenido.insert("8.0", "B: Tabla Control Procesos\n\n")
         #Contenido.insert("8.0", "Las teclas seran detectadas al presionar [Enter]\n\n")
 
         Contenido.bind("<KeyPress>", lambda event: self.Enter(event.char))
