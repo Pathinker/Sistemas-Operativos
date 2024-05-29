@@ -2,7 +2,7 @@ import random
 
 class Proceso:
 
-    def __init__(self, Numero, tiempoInicio):
+    def __init__(self, Numero, tiempoInicio, Quantum):
 
         self.ID = Numero
 
@@ -17,6 +17,8 @@ class Proceso:
         self.Resultado = None
 
         self.tiempoInicio = tiempoInicio
+        self.tiempoQuantum = 0
+        self.Quantum = Quantum
 
         self.tiempoBloqueado = 0
 
@@ -145,6 +147,14 @@ class Proceso:
 
         return self.tiempoInicio
     
+    def obtenerTiempoQuantum(self):
+
+        return self.tiempoQuantum
+    
+    def obtenerQuantum(self):
+
+        return self.Quantum
+    
     def asignarID(self, Parametro):
 
         self.ID = Parametro
@@ -185,6 +195,14 @@ class Proceso:
 
         self.tiempoBloqueado = Parametro
 
+    def asignarTiempoQuantum(self, Parametro):
+
+        self.tiempoQuantum = Parametro    
+
+    def asignarQuantum(self, Parametro):
+
+        self.Quantum = Parametro   
+
     def obtenerNuevo(self):
 
         Temporal = []
@@ -194,6 +212,19 @@ class Proceso:
         Temporal.append(self.obtenerTiempoEjecutado()) 
 
         return Temporal
+    
+    def obtenerListo(self):
+
+        Temporal = []
+
+        Temporal.append(self.obtenerID())
+        Temporal.append(self.obtenerTiempoEstimado())
+        Temporal.append(self.obtenerTiempoEjecutado())
+        Temporal.append(self.obtenerPrimerOperando()) 
+        Temporal.append(self.obtenerOperacion())
+        Temporal.append(self.obtenerSegundoOperando())
+
+        return Temporal      
 
     def obtenerEjecuccion(self):
 
@@ -202,6 +233,7 @@ class Proceso:
         Temporal.append(self.obtenerID())
         Temporal.append(self.obtenerTiempoEstimado())
         Temporal.append(self.obtenerTiempoEjecutado())
+        Temporal.append(self.obtenerTiempoQuantum())
         Temporal.append(self.obtenerPrimerOperando()) 
         Temporal.append(self.obtenerOperacion())
         Temporal.append(self.obtenerSegundoOperando())
