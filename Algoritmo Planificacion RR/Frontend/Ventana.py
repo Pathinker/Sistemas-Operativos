@@ -129,7 +129,7 @@ class Ventana:
         botonFrame.grid(row = 2, column = 0, sticky = "nsew")
         
         cantidadFrame.rowconfigure(0, weight = 1)
-        cantidadFrame.rowconfigure(1, weight  = 1)
+        #cantidadFrame.rowconfigure(1, weight  = 1)
         cantidadFrame.columnconfigure(0, weight = 1)
 
         botonFrame.rowconfigure(0, weight = 1)
@@ -158,8 +158,8 @@ class Ventana:
                            command = lambda : self.continuar(cantidad, quantum),
                            corner_radius = 0)
 
-        cantidad.grid(row = 0, column = 0, sticky = "s", pady = (0,10))
-        quantum.grid(row = 1, column = 0, sticky = "n")
+        cantidad.grid(row = 0, column = 0, sticky = "s", pady = (0, 15))
+        quantum.grid(row = 1, column = 0, sticky = "s", pady = (0, 15))
         boton.grid(row = 0, column = 0, sticky = "n")
 
     def continuar(self, Cantidad, Quantum):
