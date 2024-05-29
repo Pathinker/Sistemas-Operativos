@@ -113,8 +113,10 @@ class sistemOperativo:
                         if(Estado): # Validar si el programa se acaba, en dado caso retorna verdadero
 
                             return
-                        
-                    if(self.procesosEjecucion[0].obtenerTiempoQuantum() >=  self.procesosEjecucion[0].obtenerQuantum()):
+        
+                    #Es posible de ejectar un proceso y no tener otros, por lo tanto tengo que vovler a validar si tengo uno disponible en ejecución, para continuar el programa
+
+                    if(len(self.procesosEjecucion) > 0 and self.procesosEjecucion[0].obtenerTiempoQuantum() >=  self.procesosEjecucion[0].obtenerQuantum()):
 
                         self.roundRobin()     
                         
