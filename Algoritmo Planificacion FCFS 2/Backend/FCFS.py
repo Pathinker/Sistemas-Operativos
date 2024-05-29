@@ -311,7 +311,7 @@ class sistemOperativo:
                          values = datosTabla,
                          corner_radius = 0)
         
-        self.tablaBloqueados.grid(row = 0, column = 0, sticky = "nsew")   
+        self.tablaBloqueados.grid(row = 0, column = 0, sticky = "nsew", pady = (6,0), padx = (6, 0))   
 
     def modificarTerminados(self, Frame):
 
