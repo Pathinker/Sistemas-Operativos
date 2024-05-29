@@ -2,7 +2,7 @@ from customtkinter import *
 from CTkTable import *
 from PIL import Image
 
-from Backend import FCFS
+from Backend import RR
 
 class Ventana:
 
@@ -12,10 +12,13 @@ class Ventana:
         self.ventanaAncho = self.obtenerAncho(self.app, 70)
         self.ventanaLargo = self.obtenerLargo(self.app, 70)
         self.app.after(201, lambda : self.app.iconbitmap("Frontend/Imagenes/Icono.ico"))
-        self.app.title("Algoritmo Planificación FCFS")
+        self.app.title("Algoritmo Planificación RR")
 
         self.app.geometry(f"{self.ventanaAncho}x{self.ventanaLargo}")
-        #self.app.attributes("-fullscreen", True)
+
+        #Duracion Quantum RR
+
+        self.Quantum = None
 
         #Paleta Colores
 
@@ -96,7 +99,7 @@ class Ventana:
         contenidoFrame.columnconfigure(0, weight = 1)
 
         cantidadFrameAncho = self.obtenerEscala(anchoContenido, 100)
-        cantidadFrameLargo = self.obtenerEscala(largoContenido, 40)
+        cantidadFrameLargo = self.obtenerEscala(largoContenido, 60)
 
         botonFrameAncho = self.obtenerEscala(anchoContenido, 100)
         botonFrameLargo = self.obtenerEscala(largoContenido, 40)
@@ -104,7 +107,7 @@ class Ventana:
         texto = CTkLabel(master = contenidoFrame,
                          width = self.obtenerEscala(anchoContenido, 100),
                          height = self.obtenerEscala(largoContenido, 20),
-                         text = "Algoritmo Planificación FCFS",
+                         text = "Algoritmo Planificación RR",
                          font = ("Helvetica", 32))
         
         cantidadFrame = CTkFrame(master = contenidoFrame,
@@ -126,6 +129,7 @@ class Ventana:
         botonFrame.grid(row = 2, column = 0, sticky = "nsew")
         
         cantidadFrame.rowconfigure(0, weight = 1)
+        cantidadFrame.rowconfigure(1, weight  = 1)
         cantidadFrame.columnconfigure(0, weight = 1)
 
         botonFrame.rowconfigure(0, weight = 1)
@@ -138,25 +142,36 @@ class Ventana:
                             font = ("Helvetica", 16),
                             corner_radius = 0)
         
+        quantum = CTkEntry(master = cantidadFrame,
+                            width =self.obtenerEscala(50, cantidadFrameAncho),
+                            height = self.obtenerEscala(20,  cantidadFrameLargo),
+                            placeholder_text = "Duracion Quantum",
+                            font = ("Helvetica", 16),
+                            corner_radius = 0)
+        
         boton = CTkButton(master = botonFrame,
                            width = self.obtenerEscala(botonFrameAncho, 50),
                            height = self.obtenerEscala(botonFrameLargo, 40),
                            fg_color = self.fondoAzul,
                            text = "Crear",
                            font =("Helvetica", 16),
-                           command = lambda : self.continuar(cantidad),
+                           command = lambda : self.continuar(cantidad, quantum),
                            corner_radius = 0)
 
         cantidad.grid(row = 0, column = 0, sticky = "s", pady = (0,10))
-        boton.grid(row = 0, column = 0, sticky = "n", pady = (10, 0))
+        quantum.grid(row = 1, column = 0, sticky = "n")
+        boton.grid(row = 0, column = 0, sticky = "n")
 
-    def continuar(self, Widget):
+    def continuar(self, Cantidad, Quantum):
 
-        valor = int(Widget.get())
+        valorCantidad = int(Cantidad.get())
+        quantumCantidad = int(Quantum.get())
 
-        if(valor <= 0):
+        if(valorCantidad <= 0 or quantumCantidad <= 0):
 
             return
+        
+        self.Quantum = quantumCantidad
 
         for widget in self.app.winfo_children():
 
@@ -164,8 +179,9 @@ class Ventana:
 
         self.generarFrames(self.app)
 
-        self.Servicio = FCFS.sistemOperativo(self.app,
-                                             valor, 
+        self.Servicio = RR.sistemOperativo(self.app,
+                                             valorCantidad,
+                                             quantumCantidad,
                                              self.nuevosContenedor,
                                              self.listosContenedor,
                                              self.ejecucionContenedor,
@@ -429,17 +445,21 @@ class Ventana:
 
         encabezado.rowconfigure(0, weight = 1)
         encabezado.columnconfigure(0, weight = 1)
+        encabezado.columnconfigure(1, weight = 1)
 
-        tituloAncho = self.obtenerEscala(encabezadoAncho, 100)
-        tituloLargo = self.obtenerEscala(encabezadoLargo, 100)
+        tituloEjecucionAncho = self.obtenerEscala(encabezadoAncho, 50)
+        tituloEjecucionLargo = self.obtenerEscala(encabezadoLargo, 100)
+
+        tituloQuantumAncho = self.obtenerEscala(encabezadoAncho, 50)
+        tituloQuantumLargo = self.obtenerEscala(encabezadoLargo, 100)
 
         imagenEjecucion = CTkImage(light_image = Image.open("Frontend/Imagenes/Ejecucion.png"),
                           dark_image = Image.open("Frontend/Imagenes/Ejecucion.png"),
                           size = (16, 16))
         
         tituloEjecucion = CTkLabel(master = encabezado,
-                          width = tituloAncho,
-                          height = tituloLargo,
+                          width = tituloEjecucionAncho,
+                          height = tituloEjecucionLargo,
                           fg_color = self.primerGris,
                           text = " Ejecucion",
                           font = ("Helvetica", 14),
@@ -447,7 +467,22 @@ class Ventana:
                           image = imagenEjecucion,
                           compound = "left")
         
-        tituloEjecucion.grid(row = 0, column = 0, sticky = "nsew")  
+        imagenQuantum = CTkImage(light_image = Image.open("Frontend/Imagenes/RR.png"),
+                                 dark_image = Image.open("Frontend/Imagenes/RR.png"),
+                                 size = (16, 16))
+        
+        tituloQuantum = CTkLabel(master = encabezado,
+                          width = tituloQuantumAncho,
+                          height = tituloQuantumLargo,
+                          fg_color = self.primerGris,
+                          text = " Quantum: {} ".format(self.Quantum),
+                          font = ("Helvetica", 14),
+                          anchor = "e",
+                          image = imagenQuantum,
+                          compound = "left")        
+        
+        tituloEjecucion.grid(row = 0, column = 0, sticky = "nsew")
+        tituloQuantum.grid(row = 0, column = 1, sticky = "nsew")  
 
     def generarBloqueados(self, Frame, Ancho, Largo):
 
