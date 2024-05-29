@@ -8,7 +8,7 @@ from Frontend import BCP
 
 class sistemOperativo:
 
-    def __init__(self, Ventana, Cantidad, frameNuevos, frameListos, frameEjecucion,frameBloqueados, frameTerminados, frameTiempo, frameProcesos):
+    def __init__(self, Ventana, Cantidad, Quantum, frameNuevos, frameListos, frameEjecucion,frameBloqueados, frameTerminados, frameTiempo, frameProcesos):
 
         self.idProceso = Cantidad - 1
         self.cantidadProcesos = Cantidad
@@ -19,10 +19,11 @@ class sistemOperativo:
         self.procesosBloqueados = []
         self.procesosTerminados = []
         self.Tiempo = 0
+        self.Quantum = Quantum
 
         for i in range(Cantidad): #Es incorporado para establecer un ID ascendente a los próximos procesos creados.
 
-            Solicitud = Proceso.Proceso(i, self.Tiempo)
+            Solicitud = Proceso.Proceso(i, self.Tiempo, Quantum)
             self.procesosNuevos.append(Solicitud)
 
         self.fondoAzul = "#1565C0"
@@ -31,11 +32,11 @@ class sistemOperativo:
         self.Estado = [True]    
 
         self._stop_event = threading.Event()
-        self.iniciar(Ventana, frameNuevos, frameListos, frameEjecucion,frameBloqueados, frameTerminados, frameTiempo, frameProcesos)
+        self.iniciar(Ventana, Quantum, frameNuevos, frameListos, frameEjecucion,frameBloqueados, frameTerminados, frameTiempo, frameProcesos)
 
-    def iniciar(self, Ventana, frameNuevos, frameListos, frameEjecucion, frameBloqueados, frameTerminados, frameTiempo, frameProcesos):  
+    def iniciar(self, Ventana, Quantum, frameNuevos, frameListos, frameEjecucion, frameBloqueados, frameTerminados, frameTiempo, frameProcesos):  
 
-        self.Contador = threading.Thread(target=self.ejecutar, daemon = True, args=(Ventana, frameNuevos, frameListos, frameEjecucion, frameBloqueados, frameTerminados, frameTiempo, frameProcesos))
+        self.Contador = threading.Thread(target=self.ejecutar, daemon = True, args=(Ventana, Quantum, frameNuevos, frameListos, frameEjecucion, frameBloqueados, frameTerminados, frameTiempo, frameProcesos))
         self.Contador.start()
 
     def detener(self):
@@ -43,7 +44,7 @@ class sistemOperativo:
         self._stop_event.set()
         self.Contador.join(timeout=0)      
 
-    def ejecutar(self, Ventana, frameNuevos, frameListos, frameEjecucion, frameBloqueados, frameTerminados, frameTiempo, frameProcesos):
+    def ejecutar(self, Ventana, Quantum, frameNuevos, frameListos, frameEjecucion, frameBloqueados, frameTerminados, frameTiempo, frameProcesos):
 
         self.recalcular(frameProcesos) # Carga los lotes en Listo y Ejecucion
         self.modificarNuevos(frameNuevos)
@@ -62,7 +63,7 @@ class sistemOperativo:
 
                     if(self.procesosEjecucion[0].obtenerTiempoRespuesta() == None): #Tiempo Respuesta
                         
-                        self.procesosEjecucion[0].calcularRespuesta(self.Tiempo)                
+                        self.procesosEjecucion[0].calcularRespuesta(self.Tiempo)                  
 
                 time.sleep(1)
 
@@ -72,8 +73,10 @@ class sistemOperativo:
                 if(len(self.procesosEjecucion) > 0): #Validar que no tenga todos bloqueados              
 
                     self.procesosEjecucion[0].asignarTiempoEjecutado(self.procesosEjecucion[0].obtenerTiempoEjecutado() + 1)
+                    self.procesosEjecucion[0].asignarTiempoQuantum(self.procesosEjecucion[0].obtenerTiempoQuantum() + 1)
                     self.tablaEjecucion.insert(1,2,self.procesosEjecucion[0].obtenerTiempoEjecutado())
-
+                    self.tablaEjecucion.insert(1,3,self.procesosEjecucion[0].obtenerTiempoQuantum())
+                
                 #Actualizar el tiempo de bloqueo si es que existen
 
                 if(len(self.procesosBloqueados) > 0 ):
@@ -101,7 +104,7 @@ class sistemOperativo:
 
                 #Al agotarse el tiempo de ejecucion hacer un swap mandar el ejecutado a terminado y uno de listo a ejecucion.
 
-                if(len(self.procesosEjecucion) > 0): #Validar que no tenga todos bloqueados     
+                if(len(self.procesosEjecucion) > 0): #Validar que no tenga todos bloqueados
 
                     if(self.procesosEjecucion[0].obtenerTiempoEjecutado() >= self.procesosEjecucion[0].obtenerTiempoEstimado()):
                         
@@ -110,6 +113,10 @@ class sistemOperativo:
                         if(Estado): # Validar si el programa se acaba, en dado caso retorna verdadero
 
                             return
+                        
+                    if(self.procesosEjecucion[0].obtenerTiempoQuantum() >=  self.procesosEjecucion[0].obtenerQuantum()):
+
+                        self.roundRobin()     
                         
                 if(self.Tecla != None):
 
@@ -192,6 +199,7 @@ class sistemOperativo:
         
     def intercambiar(self):
 
+        self.procesosEjecucion[0].asignarTiempoQuantum(0) # Resetear el tiempo del Quantum
         self.procesosBloqueados.append(self.procesosEjecucion.pop(0))
         self.tablaEjecucion.delete_row(1)
 
@@ -273,7 +281,7 @@ class sistemOperativo:
         Frame.columnconfigure(0, weight = 1)
 
         Valores = self.procesosEjecucion
-        datosTabla = [["ID", "T/ Est", "T/ Eje", "1°N", "Op", "2°N"]]
+        datosTabla = [["ID", "T/ Est", "T/ Eje", "T/ Qua", "1°N", "Op", "2°N"]]
 
         for i in  Valores:
 
@@ -282,6 +290,7 @@ class sistemOperativo:
             Datos.append(i.obtenerID())
             Datos.append(i.obtenerTiempoEstimado())
             Datos.append(i.obtenerTiempoEjecutado())
+            Datos.append(i.obtenerTiempoQuantum())
             Datos.append(i.obtenerPrimerOperando())
             Datos.append(i.obtenerOperacion())
             Datos.append(i.obtenerSegundoOperando())
@@ -339,7 +348,7 @@ class sistemOperativo:
 
         if(len(self.procesosListos) > 0):
 
-            self.tablaListos.add_row(self.procesosListos[len(self.procesosListos) - 1].obtenerEjecuccion())
+            self.tablaListos.add_row(self.procesosListos[len(self.procesosListos) - 1].obtenerListo())
 
     def agregarEjecucion(self):
 
@@ -356,6 +365,11 @@ class sistemOperativo:
         if(len(self.procesosNuevos) > 0):
 
             self.tablaNuevos.delete_row(1)
+
+    def actualizarListos(self):
+
+        self.tablaListos.delete_row(1)
+        self.tablaListos.add_row(self.procesosListos[len(self.procesosListos) - 1].obtenerListo()) 
 
     def actualizarEjecucion(self):
 
@@ -387,7 +401,7 @@ class sistemOperativo:
     def agregarNuevoProceso(self, frameProcesos):
 
         self.idProceso += 1
-        nuevoProceso = Proceso.Proceso(self.idProceso, self.Tiempo)
+        nuevoProceso = Proceso.Proceso(self.idProceso, self.Tiempo, self.Quantum)
 
         if(len(self.procesosBloqueados) + len(self.procesosListos) + len(self.procesosEjecucion) >= 4): # Memoria Llena
 
@@ -407,6 +421,21 @@ class sistemOperativo:
             nuevoProceso.asignarTiempoLlegada(self.Tiempo)
             self.procesosEjecucion.append(nuevoProceso)
             self.agregarEjecucion()
+
+    def roundRobin(self):
+
+        self.procesosEjecucion[0].asignarTiempoQuantum(0)
+
+        if(len(self.procesosListos) > 0): # Si existen procesos en listo entonces lo movemos ahi.
+
+            self.procesosListos.append(self.procesosEjecucion.pop(0))
+            self.actualizarListos()
+            self.procesosEjecucion.append(self.procesosListos.pop(0))
+            self.actualizarEjecucion()
+            
+        else: #En caso contrario lo dejamos en memoria, pero le resetemoas el quantum
+
+            return
 
     def obtenerInput(self, Ventana, Caracter, frameProcesos):
 
