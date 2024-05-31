@@ -1,8 +1,12 @@
 ## **Sistemas Operativos**
 
-Agrupa una serie de programas simulando la gestión de peticiones mediante diferentes algoritmos de planificación y gestión de memoria, son desarrollados en varios lenguajes optando por el uso principalmente de Python para la confección de una GUI.
+<p align="justify">
+    Agrupa una serie de programas simulando la gestión de peticiones mediante diferentes algoritmos de planificación y gestión de memoria, son desarrollados en varios lenguajes optando por el uso principalmente de Python para la confección de una GUI.
+</p>
 
-En cada uno de los programas se detallan sus características en conjunto con un video de su funcionamiento, todos desarrollan al programa previo excepto "Productor Consumidor"
+<p align="justify">
+    En cada uno de los programas se detallan sus características en conjunto con un video de su funcionamiento, todos desarrollan al programa previo excepto "Productor Consumidor".
+</p>
 
 ## **Propósito**
 
