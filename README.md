@@ -8,10 +8,6 @@
     En cada uno de los programas se detallan sus características en conjunto con un video de su funcionamiento, todos desarrollan al programa previo excepto "Productor Consumidor".
 </p>
 
-## **Propósito**
-
-Recapitular y poner en práctica conocimientos adquiridos sobre sistemas operativos.
-
 ## Programas Implementados
 
 - ![Completado](https://img.shields.io/badge/Completado-%231565C0?style=flat-square) Procesamiento Lotes
