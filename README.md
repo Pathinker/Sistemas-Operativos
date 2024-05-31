@@ -1,30 +1,24 @@
-## Sistemas Operativos
+## **Sistemas Operativos**
 
 Agrupa una serie de programas simulando la gestión de peticiones mediante diferentes algoritmos de planificación y gestión de memoria, son desarrollados en varios lenguajes optando por el uso principalmente de Python para la confección de una GUI.
 
 En cada uno de los programas se detallan sus características en conjunto con un video de su funcionamiento, todos desarrollan al programa previo excepto "Productor Consumidor"
 
-## Propósito
+## **Propósito**
 
 Recapitular y poner en práctica conocimientos adquiridos sobre sistemas operativos.
 
-## Programas Implementados:
+## Programas Implementados
 
-Procesamiento Lotes
+- ![Completado](https://img.shields.io/badge/Completado-%231565C0?style=flat-square) Procesamiento Lotes
+- ![Completado](https://img.shields.io/badge/Completado-%231565C0?style=flat-square) Multiprogramación Lotes
+- ![Completado](https://img.shields.io/badge/Completado-%231565C0?style=flat-square) Algoritmo Planificación First Come First Serve
+- ![Completado](https://img.shields.io/badge/Completado-%231565C0?style=flat-square) Algoritmo Planificación First Come First Serve 2
+- ![Completado](https://img.shields.io/badge/Completado-%231565C0?style=flat-square) Productor Consumidor
+- ![Completado](https://img.shields.io/badge/Completado-%231565C0?style=flat-square) Algoritmo Planificación Round Robin
+- ![Pendiente](https://img.shields.io/badge/Pendiente-lightgrey?style=flat-square) Paginación Simple
 
-Multiprogramación Lotes
-
-Algoritmo Planificación First Come First Serve
-
-Algoritmo Planificación First Come First Serve 2
-
-Productor Consumidor
-
-Algoritmo Planificación Round Robin
-
-Paginación Simple
-
-## Instalación Librerías
+## **Instalación Librerías**
 
 ```
 pip install customtkinter
