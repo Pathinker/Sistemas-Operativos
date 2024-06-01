@@ -13,6 +13,6 @@ El objetivo de la actividad es simular en cualquier lenguaje de programación de
 
 **3.-** Mostrar en cada ejecución la cantidad de lotes restantes, actual y procesados.
 
-## **Caracteristicas**
+## **Características**
 
 - En memoria solamente es posible procesar un solo lote, ejecuta el siguiente hasta finalizar el previo.
