@@ -29,3 +29,7 @@ La multiprogramación es aplicada al ser susceptible de recibir inputs del tecla
 ## **Características Previas**
 
 - En memoria solamente es posible procesar un solo lote, ejecuta el siguiente hasta finalizar el previo.
+
+## **Funcionamiento**
+
+https://github.com/DarchoG/Sistemas-Operativos/assets/159450603/291ca088-da92-4098-b5ee-cf84dcae2941
