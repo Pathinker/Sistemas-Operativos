@@ -16,3 +16,7 @@ El objetivo de la actividad es simular en cualquier lenguaje de programación de
 ## **Características**
 
 - En memoria solamente es posible procesar un solo lote, ejecuta el siguiente hasta finalizar el previo.
+
+## **Funcionamiento**
+
+https://github.com/DarchoG/Sistemas-Operativos/assets/159450603/d3ee3a40-7027-4780-b09b-33cca30032ff
