@@ -25,3 +25,7 @@ La multiprogramación es aplicada al ser susceptible de recibir inputs del tecla
 - **P:** Pausa, interrumpe totalmente la ejecución.
 
 - **C:** Continuar, reanuda la ejecución de las instrucciones.
+
+## **Características Previas**
+
+- En memoria solamente es posible procesar un solo lote, ejecuta el siguiente hasta finalizar el previo.
