@@ -32,4 +32,4 @@ La multiprogramación es aplicada al ser susceptible de recibir inputs del tecla
 
 ## **Funcionamiento**
 
-https://github.com/DarchoG/Sistemas-Operativos/assets/159450603/022471be-2bf4-42e4-97c1-2e12d1f15543
+https://github.com/DarchoG/Sistemas-Operativos/assets/159450603/fc2dd56f-fc90-43ee-9bfa-c99946fddf58
