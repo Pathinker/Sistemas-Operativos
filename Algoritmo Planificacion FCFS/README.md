@@ -32,8 +32,6 @@ Adicionalmente los lotes son sustituidos por procesos, alojando en memoria de ig
 
 ## **Características Previas**
 
-- En memoria solamente es posible procesar un solo lote, ejecuta el siguiente hasta finalizar el previo.
-
 **Estados en Memoria:**
 
 - **Nuevo:** Espera la asignación de recursos.
@@ -56,4 +54,4 @@ Adicionalmente los lotes son sustituidos por procesos, alojando en memoria de ig
 
 ## **Funcionamiento**
 
-https://github.com/DarchoG/Sistemas-Operativos/assets/159450603/7ec14363-47d5-45d3-bed5-6e2fcd4cc083
+https://github.com/DarchoG/Sistemas-Operativos/assets/159450603/c6d514a0-5781-4ac6-89f6-10895264d73d
