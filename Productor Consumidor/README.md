@@ -1,7 +1,7 @@
 ## **Productor Consumidor**
 
 <p align="justify">
-El programa productor consumidor asemeja el comportamiento de un servidor donde de igual manera es susceptible de tener varios productores y consumidores que accedan de manera simultánea a datos, productos o elementos requeridos, de igual manera es posible tener un único productor con varios consumidores y viceversa, aunque en los requisitos solo fue necesario simular el comportamiento más sencillo de un productor y un consumidor.
+Asemeja el comportamiento de un servidor donde de igual manera es susceptible de tener varios productores y consumidores que accedan de manera simultánea a datos, productos o elementos requeridos, de igual manera es posible tener un único productor con varios consumidores y viceversa, aunque en los requisitos solo fue necesario simular el comportamiento más sencillo de un productor y un consumidor.
 </p>
 
 <p align="justify">
