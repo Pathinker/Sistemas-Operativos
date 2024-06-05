@@ -34,9 +34,9 @@ En memoria solamente es posible alojar 4 procesos, un proceso es considerado en 
 
 - **C:** Continuar, reanuda la ejecución de las instrucciones.
 
-- **B:** Muestra en una ventana aparte la tabla BCP (Bloque Control Proceso) con todos los tiempos disponibles al momento.
-
 - **N:** Crea un nuevo proceso respetando la capacidad de memoria disponible y asignando a su estado correspondiente.
+
+- **B:** Muestra en una ventana aparte la tabla BCP (Bloque Control Proceso) con todos los tiempos disponibles al momento.
 
 **Tiempos:**
 
