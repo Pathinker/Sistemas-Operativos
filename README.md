@@ -24,6 +24,8 @@
 pip install customtkinter
 
 pip install CTktable
+
+pip install pillow
 ```
 
 > [!WARNING]
